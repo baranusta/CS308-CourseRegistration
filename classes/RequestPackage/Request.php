@@ -1,6 +1,6 @@
 <?php
-include 'Student.php';
-include 'Professor.php';
+include_once 'ProfessorPackage/Professor.php';
+include_once 'StudentPackage/Student.php';
 
 class Request
 {	

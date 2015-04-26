@@ -1,5 +1,5 @@
 <?php
-include 'Courses.php';
+include_once 'Courses.php';
 
 class Schedule
 {	
