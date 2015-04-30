@@ -8,7 +8,7 @@ class StudentCourseController
 	
 	public function SendRequest($req)
 	{
-		Buralarý nasý yapsak bilemedim. Sýkýntýlar mevcudðð.
+		//Buralarý nasý yapsak bilemedim. Sýkýntýlar mevcudðð.
 	}
 	
 }
