@@ -1,8 +1,8 @@
 <?php
-include_once 'PersonalInfoPackage/PersonalInfo.php';
-include_once 'Courses.php';
-include_once 'RequestPackage/Request.php';
-include_once 'User.php'
+//include_once 'PersonalInfoPackage/PersonalInfo.php';
+//include_once 'Courses.php';
+//include_once 'RequestPackage/Request.php';
+include_once 'User.php';
 
 class Professor extends User
 {
