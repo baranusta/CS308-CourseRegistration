@@ -4,6 +4,7 @@ include_once 'Schedule.php';
 //include_once 'ProfessorPackage/Professor.php';
 //include_once 'StudentPackage/Student.php';
 
+include_once 'DBFunctions.php';
 
 class Course
 {	
@@ -21,9 +22,9 @@ class Course
 	private $students;
 	private $grades;
 	
-	public function __construct($row,$Term)
+	public function __construct(/* $row,$Term */)
 	{
-		$this->cnr = $row["cnr"];
+		/* $this->cnr = $row["cnr"];
 		$this->longName = $row["longName"];
 		$this->shortName = $row["classCode"];
 		$this->capacity = $row["capacity"];
@@ -35,15 +36,41 @@ class Course
 		$this->students = array();
 		$this->prerequisites = array();
 		$this->professor = array();
-		$insNames = $row["instructors1"];
+		$insNames = $row["instructors"];
 		$ins = explode(",",$insNames);
 		foreach($ins as $insName)
 		{
 			array_push($this->professor,$insName);
 		}
-		$this->grades = array("id" => 0, "grade" => "wow");
+		$this->grades = array("id" => 0, "grade" => "wow"); */
 	}
-	
+	public function addCourse($course)
+	{
+		DBFunctions::SetRemoteConnection();	
+		
+		echo "INSERT INTO `schedule`.`courses".$course['cTerm']."` 
+		(`cnr`, `profID`, `longName`, `classCode`, `section`, `faculty`, `schedule`, 
+		`instructors`, `capacity`) 
+		VALUES ('".$course['cnr']."', '".$course['profID']."', '".$course['longName']."', '".$course['classCode']."', 
+		'".$course['section']."', '".$course['faculty']."', '".$course['schedule']."', '".$course['instructors']."', 
+		'".$course['capacity']."');";
+		
+		$sql="INSERT INTO `schedule`.`courses".$course['cTerm']."` 
+		(`cnr`, `profID`, `longName`, `classCode`, `section`, `faculty`, `schedule`, 
+		`instructors`, `capacity`) 
+		VALUES ('".$course['cnr']."', '".$course['profID']."', '".$course['longName']."', '".$course['classCode']."', 
+		'".$course['section']."', '".$course['faculty']."', '".$course['schedule']."', '".$course['instructors']."', 
+		'".$course['capacity']."');";
+
+		
+		if(mysql_query($sql))
+		{
+			echo"SUCCESS!!";
+		}
+		else
+			echo"FAIL!!";
+		DBFunctions::CloseConnection();
+	}
 	public function getFaculty()
 	{
 		return $faculty;
