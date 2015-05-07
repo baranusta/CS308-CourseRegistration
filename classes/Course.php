@@ -4,6 +4,7 @@ include_once 'Schedule.php';
 //include_once 'ProfessorPackage/Professor.php';
 //include_once 'StudentPackage/Student.php';
 
+include_once 'DBFunctions.php';
 
 class Course
 {	
@@ -21,21 +22,22 @@ class Course
 	private $students;
 	private $grades;
 	
-	public function __construct($row,$Term)
+	public function __construct($row,$Term )
 	{
 		$this->cnr = $row["cnr"];
 		$this->longName = $row["longName"];
 		$this->shortName = $row["classCode"];
 		$this->capacity = $row["capacity"];
-		$this->actual = $row["actual"];
-		$this->credits = 3;
+		$this->actual = 0;
+		$this->credits = $row["credits"];
+		$this->section = $row["section"];
 		$this->term = $Term;
-		$this->faculty = "FENS";
-		$this->schedules = array();
+		//$this->faculty = $row["faculty"];
+		$this->schedules = $row["schedule"];
 		$this->students = array();
 		$this->prerequisites = array();
 		$this->professor = array();
-		$insNames = $row["instructors1"];
+		$insNames = $row["instructors"];
 		$ins = explode(",",$insNames);
 		foreach($ins as $insName)
 		{
@@ -43,11 +45,35 @@ class Course
 		}
 		$this->grades = array("id" => 0, "grade" => "wow");
 	}
-	
-	public function getFaculty()
+	public function addCourse($course)
+	{
+		DBFunctions::SetRemoteConnection();	
+		
+		/*echo "INSERT INTO `schedule`.`courses".$course['cTerm']."` 
+		(`cnr`, `profID`, `longName`, `classCode`, `section`, `schedule`, 
+		`instructors`, `capacity`) 
+		VALUES ('".$this->cnr."', '".$course['profID']."', '".$this->longName."', '".$this->shortName."', 
+		'".$this->section."', '".$this->schedules."', '".$course['instructors']."','".$this->capacity ."');";*/
+		
+		$sql="INSERT INTO `schedule`.`courses".$course['cTerm']."` 
+		(`cnr`, `profID`, `longName`, `classCode`, `section`, `schedule`, 
+		`instructors`, `capacity`) 
+		VALUES ('".$this->cnr."', '".$course['profID']."', '".$this->longName."', '".$this->shortName."', 
+		'".$this->section."', '".$this->schedules."', '".$course['instructors']."','".$this->capacity ."');";
+
+		
+		if(mysql_query($sql))
+		{
+			echo"SUCCESS!!";
+		}
+		else
+			echo"FAIL!!";
+		DBFunctions::CloseConnection();
+	}
+	/*public function getFaculty()
 	{
 		return $faculty;
-	}
+	}*/
 	
 	public function getProfessor()
 	{
