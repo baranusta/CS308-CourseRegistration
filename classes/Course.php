@@ -29,7 +29,7 @@ class Course
 		$this->shortName = $row["classCode"];
 		$this->capacity = $row["capacity"];
 		$this->actual = 0;
-		$this->credits = $row["credits"];
+		$this->credits = 3;
 		$this->section = $row["section"];
 		$this->term = $Term;
 		//$this->faculty = $row["faculty"];
@@ -50,17 +50,17 @@ class Course
 		DBFunctions::SetRemoteConnection();	
 		
 		echo "INSERT INTO `schedule`.`courses".$course['cTerm']."` 
-		(`cnr`, `profID`, `longName`, `classCode`, `section`, `faculty`, `schedule`, 
+		(`cnr`, `profID`, `longName`, `classCode`, `section`, `schedule`, 
 		`instructors`, `capacity`) 
 		VALUES ('".$course['cnr']."', '".$course['profID']."', '".$course['longName']."', '".$course['classCode']."', 
-		'".$course['section']."', '".$course['faculty']."', '".$course['schedule']."', '".$course['instructors']."', 
+		'".$course['section']."', '".$course['schedule']."', '".$course['instructors']."', 
 		'".$course['capacity']."');";
 		
 		$sql="INSERT INTO `schedule`.`courses".$course['cTerm']."` 
-		(`cnr`, `profID`, `longName`, `classCode`, `section`, `faculty`, `schedule`, 
+		(`cnr`, `profID`, `longName`, `classCode`, `section`, `schedule`, 
 		`instructors`, `capacity`) 
 		VALUES ('".$course['cnr']."', '".$course['profID']."', '".$course['longName']."', '".$course['classCode']."', 
-		'".$course['section']."', '".$course['faculty']."', '".$course['schedule']."', '".$course['instructors']."', 
+		'".$course['section']."', '".$course['schedule']."', '".$course['instructors']."', 
 		'".$course['capacity']."');";
 
 		
@@ -73,31 +73,6 @@ class Course
 		DBFunctions::CloseConnection();
 	}
 
-	public function addCourse($course)
-	{
-		DBFunctions::SetRemoteConnection();	
-		
-		/*echo "INSERT INTO `schedule`.`courses".$course['cTerm']."` 
-		(`cnr`, `profID`, `longName`, `classCode`, `section`, `schedule`, 
-		`instructors`, `capacity`) 
-		VALUES ('".$this->cnr."', '".$course['profID']."', '".$this->longName."', '".$this->shortName."', 
-		'".$this->section."', '".$this->schedules."', '".$course['instructors']."','".$this->capacity ."');";*/
-		
-		$sql="INSERT INTO `schedule`.`courses".$course['cTerm']."` 
-		(`cnr`, `profID`, `longName`, `classCode`, `section`, `schedule`, 
-		`instructors`, `capacity`) 
-		VALUES ('".$this->cnr."', '".$course['profID']."', '".$this->longName."', '".$this->shortName."', 
-		'".$this->section."', '".$this->schedules."', '".$course['instructors']."','".$this->capacity ."');";
-
-		
-		if(mysql_query($sql))
-		{
-			echo"SUCCESS!!";
-		}
-		else
-			echo"FAIL!!";
-		DBFunctions::CloseConnection();
-	}
 	/*public function getFaculty()
 	{
 		return $faculty;
