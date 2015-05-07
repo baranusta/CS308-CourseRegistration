@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 //include_once 'PersonalInfoPackage/PersonalInfo.php';
 //include_once 'Courses.php';
 //include_once 'RequestPackage/Request.php';
@@ -32,7 +32,6 @@ class CoursesController
 				echo $prof_id;
 				if($prof_id >=0)
 				{
-					
 					$courseToBeAdded = array(
 					"cnr" => $params['cCRN'], 
 					"profID" => $prof_id, 
@@ -66,6 +65,7 @@ class CoursesController
 		return false;
 	}
 	//private function ControlSchedule($schedule){}
+
 	
 	//takes term and required where statemnt for sql
 	//returns all the suitable courses
