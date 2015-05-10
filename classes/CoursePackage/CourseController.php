@@ -10,13 +10,22 @@ class CoursesController
 {	
 	//First, obtains all suitable courses
 	//Then gets all the page items
-	public function GetSearchedCoursesItems($term,$where){
+	public function GetSearchedCoursesItems($term,$where,&$json = null){
 		$AllCourses = $this->GetSearchedCourses($term,$where);
+		if(!isset($_SESSION)){
+			session_start();
+		}
+		$_SESSION["AllCourses"] = $AllCourses;
 		$wholeString = "";
+		$AllJSON ="";
 		foreach($AllCourses as $Course)
 		{
 			$wholeString .= $Course->GetPageItem();
+			$AllJSON.= "\"".$Course->getCNR()."\":".$Course->getJSON().",";
 		}
+		$json = $AllJSON;
+		$json = substr($json, 0, -1);
+		$json = "{".$json."}";
 		return $wholeString;
 	}
 	
@@ -69,19 +78,22 @@ class CoursesController
 	
 	//takes term and required where statemnt for sql
 	//returns all the suitable courses
-	private function GetSearchedCourses($term, $where){
+	public function GetSearchedCourses($term, $where){
 		DBFunctions::SetRemoteConnection();
 		$AllCourses = array();
+		//we may erase this
+		mysql_query('SET CHARACTER SET utf8');
 		$sql="SELECT * FROM schedule.courses".$term." ".$where;
 		$result=mysql_query($sql);
+		DBFunctions::CloseConnection();
 		if($result)
 		{
 			while($row = mysql_fetch_assoc($result)) {
-				array_push($AllCourses,new Course($row,$term));
+				$AllCourses[$row['cnr']."cnr"] = new Course($row,$term);
 			   //echo "<pre>"; print_r($row); echo "</pre>";
 			}
 		}
-		DBFunctions::CloseConnection();
+		
 		return $AllCourses;
 	}
 	

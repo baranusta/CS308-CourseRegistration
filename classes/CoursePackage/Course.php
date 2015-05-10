@@ -20,6 +20,7 @@ class Course
 	private $prerequisites;
 	private $professor;
 	private $students;
+	private $studentArr;
 	private $grades;
 	
 	public function __construct($row,$Term )
@@ -33,9 +34,54 @@ class Course
 		$this->section = $row["section"];
 		$this->term = $Term;
 		//$this->faculty = $row["faculty"];
-		$this->schedules = $row["schedule"];
+		$scheduleArr = $row["schedule"];
+		$scheduleArr = substr($scheduleArr, 1, -1);
+		$Arr = explode(",",$scheduleArr);
+		$this->schedules = array();
+		foreach($Arr as $elm){
+			if($elm)
+			{
+				$day = explode(":",$elm);
+				try{
+				$schedule["time"] = $day[0];
+				$schedule["day"] = $day[1];
+				$schedule["place"] = $day[2];
+				}
+				catch(Exception $e){
+					echo $elm;
+					echo $day ;
+				}
+				// echo implode(" ",$schedule);
+				array_push($this->schedules,$schedule);
+			}
+		}
+		
+		$this->studenteArr = $row["registeredStudents"];
+		$Arr = explode(",",$this->studenteArr);
 		$this->students = array();
+		foreach($Arr as $elm){
+			if($elm){
+				
+				$studentInfo = explode(":",$elm);
+				try{
+				$student["id"] = $studentInfo[0];
+				$student["grade"] = $studentInfo[1];
+				}
+				catch(Exception $e){
+					echo $elm;
+					echo $studentInfo ;
+				}// echo implode(" ",$schedule);
+				array_push($this->students,$student);
+			}
+		}
+		
+		$Requisites = $row["prerequest"];
+		$Arr = explode(",",$Requisites);
 		$this->prerequisites = array();
+		foreach($Arr as $elm){
+			if($elm)
+				array_push($this->prerequisites,$elm);
+		}
 		$this->professor = array();
 		$insNames = $row["instructors"];
 		$ins = explode(",",$insNames);
@@ -90,7 +136,7 @@ class Course
 	*/
 	public function GetPageItem()
 	{
-		$wholeItem = "	<input type=\"checkbox\" name=\"".$this->cnr."\">
+		$wholeItem = "	<input type=\"checkbox\" name=\"cnr[]\" value=\"".$this->cnr."\">
 						<tr>
 						<a >".$this->longName."</a>&nbsp;&nbsp;
 						<th class=\"ddlabel\" scope=\"row\">
@@ -114,44 +160,44 @@ class Course
 						<br>";
 		
 		return $wholeItem."<br>";
-		
-
-		// echo "Ayşe Gül Altınay  
-				// <br>
-				// <br>
-				// Sabancı University Campus Campus
-				// <br>
-				// Lecture Schedule Type
-				// <br>
-					   // 3.000 Credits
-				// <br>
-				// <a href=\"/prod/bwckctlg.p_display_courses?term_in=201402&amp;one_subj=ANTH&amp;sel_crse_strt=214&amp;sel_crse_end=214&amp;sel_subj=&amp;sel_levl=&amp;sel_schd=&amp;sel_coll=&amp;sel_divs=&amp;sel_dept=&amp;sel_attr=\">View Catalog Entry</a>
-				// <br>
-				// <br>
-				// <table class=\"datadisplaytable\" summary=\"This table lists the scheduled meeting times and assigned instructors for this class..\"><caption class=\"captiontext\">Scheduled Meeting Times</caption>
-				// <tbody><tr>
-				// <th class=\"ddheader\" scope=\"col\">Type</th>
-				// <th class=\"ddheader\" scope=\"col\">Time</th>
-				// <th class=\"ddheader\" scope=\"col\">Days</th>
-				// <th class=\"ddheader\" scope=\"col\">Where</th>
-				// <th class=\"ddheader\" scope=\"col\">Date Range</th>
-				// <th class=\"ddheader\" scope=\"col\">Schedule Type</th>
-				// <th class=\"ddheader\" scope=\"col\">Instructors</th>
-				// </tr>
-				// <tr>
-				// <td class=\"dddefault\">Class</td>
-				// <td class=\"dddefault\">10:40 am - 1:30 pm</td>
-				// <td class=\"dddefault\">M</td>
-				// <td class=\"dddefault\">Fac.of Arts and Social Sci. 1001</td>
-				// <td class=\"dddefault\">Feb 02, 2015 - May 15, 2015</td>
-				// <td class=\"dddefault\">1st del</td>
-				// <td class=\"dddefault\">Ayşe Gül Altınay (<abbr title=\"Primary\">P</abbr>)<a href=\"mailto:altinay@sabanciuniv.edu\" target=\"Ayşe Gül Altınay\"><img src=\"https://suisimg.sabanciuniv.edu/wtlgifs/web_email.gif\" align=\"middle\" alt=\"E-mail\" class=\"headerImg\" title=\"E-mail\" name=\"web_email\" hspace=\"0\" vspace=\"0\" border=\"0\" height=\"28\" width=\"28\"></a></td>
-				// </tr>
-				// </tbody></table>
-				// <br>
-				// <br>
-				// </td>";
-
+	}
+	
+	public function GetJSON()
+	{
+		return "   [{\"cnr\" : \"$this->cnr\", 
+					\"schedule\" : ".json_encode($this->schedules).",
+					\"prerequisites\" : ".json_encode($this->prerequisites)."}]"
+					/*\"students\" : ".json_encode($this->students).",
+					\"professor\" : \"$this->cnr\"}]"*/;
+	}
+	
+	public function registerStudent($stuId){
+		if(count($this->studentArr)==0)
+			$allStu = $stuId.":InProgress";
+		else
+			$allStu = $this->studentArr.",".$stuId.":InProgress";
+		$sql =	"UPDATE schedule.courses".$this->term."
+				 SET registeredStudents = '$allStu'
+				 WHERE cnr='$this->cnr'";
+				 
+		echo $sql;
+		DBFunctions::SetRemoteConnection();	
+		if(mysql_query($sql))
+		{
+			echo"SUCCESS!!";
+		}
+		else
+			echo"FAIL!!";
+		DBFunctions::CloseConnection();
+	}
+	
+	public function getSchedule()
+	{
+		return $this->schedules;
+	}
+	
+	public function getCNR(){
+		return $this->cnr;
 	}
 	
 }
