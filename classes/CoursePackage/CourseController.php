@@ -10,13 +10,22 @@ class CoursesController
 {	
 	//First, obtains all suitable courses
 	//Then gets all the page items
-	public function GetSearchedCoursesItems($term,$where){
+	public function GetSearchedCoursesItems($term,$where,&$json = null){
 		$AllCourses = $this->GetSearchedCourses($term,$where);
+		if(!isset($_SESSION)){
+			session_start();
+		}
+		$_SESSION["AllCourses"] = $AllCourses;
 		$wholeString = "";
+		$AllJSON ="";
 		foreach($AllCourses as $Course)
 		{
 			$wholeString .= $Course->GetPageItem();
+			$AllJSON.= "\"".$Course->getCNR()."\":".$Course->getJSON().",";
 		}
+		$json = $AllJSON;
+		$json = substr($json, 0, -1);
+		$json = "{".$json."}";
 		return $wholeString;
 	}
 	
@@ -42,7 +51,9 @@ class CoursesController
 					"schedule" => $params['cSchedule'], 
 					"instructors" => $params['cInstructorName']." ".$params['cInstructorLastname'], 
 					"capacity" => $params['cCapacity']	,
-					"cTerm" => $params['p_term']
+					"cTerm" => $params['p_term'],
+					"prerequest" => $params['prerequest'],
+					"corerequest" => $params['corerequest']
 					);
 					$course = new Course($courseToBeAdded, $params['p_term']);
 					$course->addCourse($courseToBeAdded);
@@ -69,22 +80,68 @@ class CoursesController
 	
 	//takes term and required where statemnt for sql
 	//returns all the suitable courses
-	private function GetSearchedCourses($term, $where){
+	public function GetSearchedCourses($term, $where){
 		DBFunctions::SetRemoteConnection();
 		$AllCourses = array();
+		//we may erase this
+		mysql_query('SET CHARACTER SET utf8');
 		$sql="SELECT * FROM schedule.courses".$term." ".$where;
 		$result=mysql_query($sql);
+		DBFunctions::CloseConnection();
 		if($result)
 		{
 			while($row = mysql_fetch_assoc($result)) {
-				array_push($AllCourses,new Course($row,$term));
+				$AllCourses[$row['cnr']."cnr"] = new Course($row,$term);
 			   //echo "<pre>"; print_r($row); echo "</pre>";
 			}
 		}
-		DBFunctions::CloseConnection();
+		
 		return $AllCourses;
 	}
-	
+	public function returnCourses($values, $term)
+	{
+		$sql = "";
+		$courseNum = "";
+		$classCode = "";
+
+		if(isset($values["sel_subj"]))
+		{
+			$classCode = $values["sel_subj"];
+		}
+		if(isset($values["sel_crse"]))
+		{
+			$courseNum = $values["sel_crse"];
+			
+		}
+		if(strlen($courseNum) && ($classCode != "*"))
+		{
+			$sql = "SELECT * From schedule.courses".$term." WHERE classCode LIKE '".$classCode."%' AND cnr ='".$courseNum."';";
+		}
+		else if (strlen($courseNum))
+		{
+			$sql = "SELECT * From schedule.courses".$term." WHERE cnr = '".$courseNum."';";
+		}
+		else if ($classCode != "*")
+		{
+			$sql = "SELECT * From schedule.courses".$term." WHERE classCode LIKE '".$classCode."%';";
+		}
+		else
+		{
+			$sql = "SELECT * From schedule.courses".$term.";";
+		}
+		DBFunctions::SetRemoteConnection();
+		$resultSet = mysql_query($sql);
+		DBFunctions::CloseConnection();
+		return $resultSet;
+	}
+	public function DeleteCourse($array)
+	{
+		DBFunctions::SetRemoteConnection();
+		$sql = "DELETE FROM `schedule`.`courses".$array[0]."` WHERE `cnr`='".$array[1]."';";
+		$result = mysql_query($sql);
+		DBFunctions::CloseConnection();
+		return $result;
+	}
 	
 }
 ?>
