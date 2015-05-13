@@ -1,14 +1,18 @@
 <?php
-class PersonalInfo
+include_once '../User.php';
+
+class PersonalInfo extends User
 {
-	private $Name;
-	private $LastName;
-	private $Address;
-	private $EnteredYear;
-	private $Nationality;
-	private $TelephoneNum;
+	protected $Name;
+	protected $LastName;
+	protected $Address;
+	protected $EnteredYear;
+	protected $Nationality;
+	protected $TelephoneNum;
+	protected $Faculty;
 	
-	public function __construct($name, $LName, $entY, $address = null, $nation = null, $telNum = null)
+	public function __construct($name = null, $LName = null, $entY = null, $address = null, 
+	$nation = null, $telNum = null, $faculty = null)
 	{
 		$this->Name = $name;
 		$this->LastName = $LName;
@@ -16,6 +20,7 @@ class PersonalInfo
 		$this->Nationality = $nation;
 		$this->TelephoneNum = $telNum;
 		$this->EnteredYear = $entY;
+		$this->Faculty = $faculty;
 	}
 }
 ?>

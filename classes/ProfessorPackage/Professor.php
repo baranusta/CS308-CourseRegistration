@@ -1,22 +1,20 @@
 <?php
-//include_once 'PersonalInfoPackage/PersonalInfo.php';
-//include_once 'Courses.php';
-//include_once 'RequestPackage/Request.php';
-include_once 'User.php';
+include_once '../PersonalInfoPackage/PersonalInfo.php';
+include_once '../User.php';
+//include_once '../Course.php';
+//include_once '../RequestPackage/Request.php';
 
 class Professor extends User
 {
-	private $Department;
-	private $GivenCourses;
-	private $RegisteredCourses;
-	private $PersonalInf;
-	private $Requests;
+	protected $GivenCourses;
+	protected $RegisteredCourses;
+	protected $PersonalInf;
+	protected $Requests;
 	
-	public function __construct($persInf, $fac = null, $major = null)
+	public function __construct($persInf)
 	{
 		$this->PersonalInf = $persInf;
-		$this->Faculty = $fac;
-		$this->Major = $major;
+		$this->RegisteredCourses = array ();
 		$this->GivenCourses = array();
 		$this->Requests = array();
 	}

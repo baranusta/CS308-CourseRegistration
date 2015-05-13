@@ -1,10 +1,15 @@
 <?php
 class User
 {
-	var $id;
-	function User($ID)
+	protected $username;
+	protected $password;
+	protected $userType;
+	
+	public function __construct($Username=null, $Password=null, $type=null)
 	{
-		$this->id = $ID;
+		$this->username = $Username;
+		$this->password = $Password;
+		$this->userType = $type;
 	}
 }
 ?>
