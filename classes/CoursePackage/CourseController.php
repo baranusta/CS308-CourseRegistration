@@ -51,7 +51,9 @@ class CoursesController
 					"schedule" => $params['cSchedule'], 
 					"instructors" => $params['cInstructorName']." ".$params['cInstructorLastname'], 
 					"capacity" => $params['cCapacity']	,
-					"cTerm" => $params['p_term']
+					"cTerm" => $params['p_term'],
+					"prerequest" => $params['prerequest'],
+					"corerequest" => $params['corerequest']
 					);
 					$course = new Course($courseToBeAdded, $params['p_term']);
 					$course->addCourse($courseToBeAdded);
@@ -96,7 +98,50 @@ class CoursesController
 		
 		return $AllCourses;
 	}
-	
+	public function returnCourses($values, $term)
+	{
+		$sql = "";
+		$courseNum = "";
+		$classCode = "";
+
+		if(isset($values["sel_subj"]))
+		{
+			$classCode = $values["sel_subj"];
+		}
+		if(isset($values["sel_crse"]))
+		{
+			$courseNum = $values["sel_crse"];
+			
+		}
+		if(strlen($courseNum) && ($classCode != "*"))
+		{
+			$sql = "SELECT * From schedule.courses".$term." WHERE classCode LIKE '".$classCode."%' AND cnr ='".$courseNum."';";
+		}
+		else if (strlen($courseNum))
+		{
+			$sql = "SELECT * From schedule.courses".$term." WHERE cnr = '".$courseNum."';";
+		}
+		else if ($classCode != "*")
+		{
+			$sql = "SELECT * From schedule.courses".$term." WHERE classCode LIKE '".$classCode."%';";
+		}
+		else
+		{
+			$sql = "SELECT * From schedule.courses".$term.";";
+		}
+		DBFunctions::SetRemoteConnection();
+		$resultSet = mysql_query($sql);
+		DBFunctions::CloseConnection();
+		return $resultSet;
+	}
+	public function DeleteCourse($array)
+	{
+		DBFunctions::SetRemoteConnection();
+		$sql = "DELETE FROM `schedule`.`courses".$array[0]."` WHERE `cnr`='".$array[1]."';";
+		$result = mysql_query($sql);
+		DBFunctions::CloseConnection();
+		return $result;
+	}
 	
 }
 ?>

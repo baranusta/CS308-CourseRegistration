@@ -21,6 +21,8 @@ class DBFunctions
 		if (!self::$conn) {
 			die('Connect Error ('.mysql_error().')');
 		}
+mysql_query("SET NAMES utf8");
+		mysql_query("SET CHARACTER SET utf8");
 	}
 	public static function CloseConnection()
 	{

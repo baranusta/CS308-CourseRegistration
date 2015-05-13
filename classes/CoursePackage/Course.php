@@ -1,7 +1,7 @@
 ﻿<?php
 set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\xampp\htdocs\CS308-CourseRegistration\classes');
 include_once 'Schedule.php';
-//include_once 'ProfessorPackage/Professor.php';
+include_once 'ProfessorPackage/ProfessorCourse.php';
 //include_once 'StudentPackage/Student.php';
 
 include_once 'DBFunctions.php';
@@ -18,6 +18,7 @@ class Course
 	private $term;
 	private $credits;
 	private $prerequisites;
+	private $corerequest;
 	private $professor;
 	private $students;
 	private $studentArr;
@@ -33,6 +34,9 @@ class Course
 		$this->credits = 3;
 		$this->section = $row["section"];
 		$this->term = $Term;
+		//$this->prerequisites = $row["prereq"];
+		$this->corerequest = $row["corerequest"];
+		//$this->schedules = $row["schedule"];
 		//$this->faculty = $row["faculty"];
 		$scheduleArr = $row["schedule"];
 		$scheduleArr = substr($scheduleArr, 1, -1);
@@ -41,11 +45,11 @@ class Course
 		foreach($Arr as $elm){
 			if($elm)
 			{
-				$day = explode(":",$elm);
+				$day = explode(";",$elm);
 				try{
-				$schedule["time"] = $day[0];
-				$schedule["day"] = $day[1];
-				$schedule["place"] = $day[2];
+					$schedule["time"] = $day[0];
+					$schedule["day"] = $day[1];
+					$schedule["place"] = $day[2];
 				}
 				catch(Exception $e){
 					echo $elm;
@@ -55,33 +59,39 @@ class Course
 				array_push($this->schedules,$schedule);
 			}
 		}
-		
-		$this->studenteArr = $row["registeredStudents"];
-		$Arr = explode(",",$this->studenteArr);
-		$this->students = array();
-		foreach($Arr as $elm){
-			if($elm){
-				
-				$studentInfo = explode(":",$elm);
-				try{
-				$student["id"] = $studentInfo[0];
-				$student["grade"] = $studentInfo[1];
+		if(isset($row["registeredStudents"]))
+		{
+			$this->studenteArr = $row["registeredStudents"];
+			$Arr = explode(",",$this->studenteArr);
+			$this->students = array();
+			foreach($Arr as $elm){
+				if($elm){
+					
+					$studentInfo = explode(":",$elm);
+					try{
+					$student["id"] = $studentInfo[0];
+					$student["grade"] = $studentInfo[1];
+					}
+					catch(Exception $e){
+						echo $elm;
+						echo $studentInfo ;
+					}// echo implode(" ",$schedule);
+					array_push($this->students,$student);
 				}
-				catch(Exception $e){
-					echo $elm;
-					echo $studentInfo ;
-				}// echo implode(" ",$schedule);
-				array_push($this->students,$student);
 			}
 		}
 		
-		$Requisites = $row["prerequest"];
-		$Arr = explode(",",$Requisites);
-		$this->prerequisites = array();
-		foreach($Arr as $elm){
-			if($elm)
-				array_push($this->prerequisites,$elm);
+		if(isset($row["prerequest"]))
+		{
+			$Requisites = $row["prerequest"];
+			$Arr = explode(",",$Requisites);
+			$this->prerequisites = array();
+			foreach($Arr as $elm){
+				if($elm)
+					array_push($this->prerequisites,$elm);
+			}
 		}
+		
 		$this->professor = array();
 		$insNames = $row["instructors"];
 		$ins = explode(",",$insNames);
@@ -95,27 +105,33 @@ class Course
 	{
 		DBFunctions::SetRemoteConnection();	
 		
-		echo "INSERT INTO `schedule`.`courses".$course['cTerm']."` 
+		/* echo "INSERT INTO `schedule`.`courses".$course['cTerm']."` 
 		(`cnr`, `profID`, `longName`, `classCode`, `section`, `schedule`, 
 		`instructors`, `capacity`) 
 		VALUES ('".$course['cnr']."', '".$course['profID']."', '".$course['longName']."', '".$course['classCode']."', 
 		'".$course['section']."', '".$course['schedule']."', '".$course['instructors']."', 
-		'".$course['capacity']."');";
+		'".$course['capacity']."');"; */
 		
 		$sql="INSERT INTO `schedule`.`courses".$course['cTerm']."` 
 		(`cnr`, `profID`, `longName`, `classCode`, `section`, `schedule`, 
-		`instructors`, `capacity`) 
+		`instructors`, `capacity`, `corerequest`, `prerequest`) 
 		VALUES ('".$course['cnr']."', '".$course['profID']."', '".$course['longName']."', '".$course['classCode']."', 
-		'".$course['section']."', '".$course['schedule']."', '".$course['instructors']."', 
-		'".$course['capacity']."');";
+		'".$course['section']."', '".json_encode($course['schedule'])."', '".$course['instructors']."', 
+		'".$course['capacity']."', '".$course['corerequest']."', '".json_encode($course['prerequest'])."');";
 
 		
 		if(mysql_query($sql))
 		{
-			echo"SUCCESS!!";
+			echo "Course added to the courses database.<br>";
+			$pc = new ProfessorCourse();
+			if($pc->AddCourse($course))
+			{
+				echo "Course added to the professor's course list in database.<br>";
+			}
+					
 		}
 		else
-			echo"FAIL!!";
+			echo "FAIL!!";
 		DBFunctions::CloseConnection();
 	}
 
