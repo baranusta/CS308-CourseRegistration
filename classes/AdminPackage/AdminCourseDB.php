@@ -13,9 +13,9 @@ class AdminCourseDB
 		//DB li bişiler çözcez
 	}
 	
-	public function DeleteCourse($Course)
+	public function DeleteCourse()
 	{
-		//DB li bişiler çözcez
+		
 	}
 }
 ?>

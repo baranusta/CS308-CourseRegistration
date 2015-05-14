@@ -1,41 +1,70 @@
 <?php
-
-session_start();
-session_unset();
-session_destroy();
-$host="localhost"; // Host name 
-$username="root"; // Mysql username 
-$password="312152"; // Mysql password 
-$db_name="CS308"; // Database name 
-$tbl_name="members"; // Table name 
-
-// Connect to server and select databse.
-mysql_connect("$host", "$username", "$password")or die("cannot connect"); 
-mysql_select_db("$db_name")or die("cannot select DB");
-
-// username and password sent from form 
-$myusername=$_POST['myusername']; 
-$mypassword=$_POST['mypassword']; 
-
-// To protect MySQL injection (more detail about MySQL injection)
-$myusername = stripslashes($myusername);
-$mypassword = stripslashes($mypassword);
-$myusername = mysql_real_escape_string($myusername);
-$mypassword = mysql_real_escape_string($mypassword);
-$sql="SELECT * FROM members WHERE username='$myusername' and password='$mypassword'";
-$result=mysql_query($sql);
-// Mysql_num_row is counting table row
-$count=mysql_num_rows($result);
-
-// If result matched $myusername and $mypassword, table row must be 1 row
-if($count==1){
-session_start();
-// Register $myusername, $mypassword and redirect to file "login_success.php"
-$_SESSION['myusername'] = $myusername;
-$_SESSION['mypassword'] = $mypassword;
-header("location:login_success.php");
-}
-else {
-echo "Wrong Username or Password";
-}
+set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\xampp\htdocs\CS308-CourseRegistration\classes');
+include_once 'StudentPackage/Student.php';
+include_once 'DBFunctions.php';
+	session_start();
+	session_destroy();
+	$tableName = 'schedule.user';
+	$username=$_POST['myusername']; 
+	$password=$_POST['mypassword']; 
+	if(UserIsExist($username,$password,$User,$tableName)){
+		// Register $myusername, $mypassword and redirect to file "login_success.php"
+		
+		// if(!isset($_SESSION)){
+			session_start();
+		// }
+		$_SESSION['userName'] = $username;
+		$_SESSION['myUser'] = $User;
+		header("location:login_success.php");
+	}
+	else {
+		echo "Wrong Username or Password";
+	}
+	
+	
+	
+	
+	function UserIsExist(&$userName,&$password,&$User,$tableName){
+		$currentTerm = '201402';
+		DBFunctions::SetRemoteConnection();
+		$userName = stripslashes($userName);
+		$password = stripslashes($password);
+		$userName = mysql_real_escape_string($userName);
+		$password = mysql_real_escape_string($password);
+		$sql="SELECT * FROM $tableName WHERE username='$userName' and password='$password'";
+		
+		$result=mysql_query($sql);
+		DBFunctions::CloseConnection();
+		
+		// Mysql_num_row is counting table row
+		$count=mysql_num_rows($result);
+		if($count==1){
+			while($row = mysql_fetch_assoc($result)) {
+				$type = $row['type'];
+				switch ($type)
+				{
+					case 'S':
+						try
+						{
+							$User = new Student($row['user_id'],$currentTerm);
+							// echo var_dump($User->getTakenCourses());
+						}
+						catch(Exception $e)
+						{
+							echo $e->getMessage();
+						}
+						break;
+					// case 'P':
+						// $_SESSION['myUser'] = new Professor();
+						// break;
+					// case 'A':
+						// $_SESSION['myUser'] = new Admin();
+						// break;
+				}
+			return true;
+			}
+		}
+		// If result matched $myusername and $mypassword, table row must be 1 row
+		return false;
+	}
 ?>
