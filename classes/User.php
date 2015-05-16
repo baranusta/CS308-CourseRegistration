@@ -2,9 +2,8 @@
 abstract class User
 {
 	var $id;
-	public function User($ID)
+	public function User()
 	{
-		$this->id = $ID;
 	}
 	
 	public function getId(){

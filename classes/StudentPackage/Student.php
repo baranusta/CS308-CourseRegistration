@@ -99,12 +99,13 @@ class Student extends User
 		if(!$this->RegisteredCourses)
 			$this->RegisteredCourses = new stdClass();
 		if(property_exists($this->RegisteredCourses, $term)){
-			$this->RegisteredCourses->{$term}->{$cnr} = 'InProgress';
+			var_dump($this->RegisteredCourses->{$term});
+			$this->RegisteredCourses->{$term}[$cnr] = 'InProgress';
 		}
 		else
 		{
 			$this->RegisteredCourses->{$term} = new stdClass();
-			$this->RegisteredCourses->{$term}->{$cnr} = 'InProgress';
+			$this->RegisteredCourses->{$term}[$cnr] = 'InProgress';
 		}
 	}
 	
