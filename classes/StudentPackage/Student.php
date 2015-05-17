@@ -13,8 +13,8 @@ class Student extends User
 	private $RegisteredCourses;
 	private $PersonalInf;
 	private $Requests;
-	private $CoursesTakenInfo;
-	private $scheduleMatrix;
+	private $CoursesTaken;
+	private $scheduleArr;
 	
 	public function __construct($id,$currentTerm)
 	{
@@ -24,11 +24,14 @@ class Student extends User
 		$this->gradYear = $row['grad_year'];
 		$this->RegisteredCourses = json_decode($row['registered_courses']);
 		$this->Requests = json_decode($row['request']);
-		$this->CoursesTakenInfo = $this->GetAllCoursesInfo();
-		// $scheduleMatrix = $this->formSchedule($currentTerm);
+		$this->CoursesTaken = $this->GetAllCourses();
+		$this->formSchedule($currentTerm);
+		
+		var_dump($CoursesNames);
 	}
-	 
-	public function GetAllCoursesInfo(){
+	
+	
+	public function GetAllCourses(){
 		$Terms = array();
 		$CourseRetriever = new CoursesController();
 		foreach($this->RegisteredCourses as $key => $value)
@@ -45,24 +48,15 @@ class Student extends User
 		return $Terms;
 	}
 	
-	private function initSchedule(){
-		$this->scheduleMatrix = array();
-		$this->scheduleMatrix['M'] = array("0","0","0","0","0","0","0","0","0","0","0");
-		$this->scheduleMatrix['T'] = array("0","0","0","0","0","0","0","0","0","0","0");
-		$this->scheduleMatrix['W'] = array("0","0","0","0","0","0","0","0","0","0","0");
-		$this->scheduleMatrix['R'] = array("0","0","0","0","0","0","0","0","0","0","0");
-		$this->scheduleMatrix['F'] = array("0","0","0","0","0","0","0","0","0","0","0");
-	}
-	
 	public function formSchedule($term){
-		$this->initSchedule();
-		if(array_key_exists($term,$this->CoursesTakenInfo))
+		if(array_key_exists($term,$this->CoursesTaken))
 		{
-			$Courses = $this->CoursesTakenInfo[$term];
+			$Courses = $this->CoursesTaken[$term];
 			foreach($Courses as $key=>$value)
 			{
 				$schedule = $value[$key."cnr"]->getSchedule();
-				$this->fillSchedule($schedule);
+				$courseName = $value[$key."cnr"]->getShortName();
+				$this->fillSchedule($schedule,$courseName);
 			}
 		}
 		else
@@ -70,14 +64,27 @@ class Student extends User
 		
 	}
 	
-	private function fillSchedule($schedule)
+	private function fillSchedule($schedule,$cName)
 	{
 		foreach($schedule as $eachDay)
 		{
-			$times = explode($eachDay["time"],"-");
-			$start = explode($times[0],":");
-			$end = explode($times[1],":");
-			$this->scheduleMatrix[$eachDay["day"]][intval($start[0])] = $eachDay["place"]; 
+			$times = explode("-",$eachDay["time"]);
+			$start = explode(":",$times[0]);
+			$end = explode(":",$times[1]);
+			$startInd = intval($start[0])-8;
+			if($startInd<0)
+			{
+				$startInd += 12;
+			}
+			$endInd = intval($end[0])-8;
+			if($endInd<0)
+			{
+				$endInd += 12;
+			}
+			for($i = $startInd; $i<$endInd ; $i++)
+			{
+				$this->scheduleArr[$eachDay["day"]][$i] = $eachDay["place"].",".$cName;
+			}
 		}
 	}
 	
@@ -89,10 +96,26 @@ class Student extends User
 		return "StudentPackage\AddCourse.php";
 	}
 	
-	public function getTakenCourses($term){
+	public function getSchedule(){
+		return $this->scheduleArr;
+	}
+	
+	public function getRegisteredCourses($term){
 		if(property_exists($this->RegisteredCourses, $term))
 			return $this->RegisteredCourses->{$term};
 		return $this->RegisteredCourses->{$term};
+	}
+	
+	public function getTakenCourses(){
+		$CoursesNames = array();
+		foreach($this->CoursesTaken as $key=> $var)
+		{
+			foreach($var as $cnr => $Obj)
+			{
+				array_push($CoursesNames,array($Obj[$cnr."cnr"]->getShortName()=>$Obj[$cnr."cnr"]->getGrade()));
+			}
+		}
+		return $CoursesNames;
 	}
 	
 	public function registerToCourse($term,$cnr){
@@ -100,12 +123,12 @@ class Student extends User
 			$this->RegisteredCourses = new stdClass();
 		if(property_exists($this->RegisteredCourses, $term)){
 			var_dump($this->RegisteredCourses->{$term});
-			$this->RegisteredCourses->{$term}[$cnr] = 'InProgress';
+			$this->RegisteredCourses->{$term}->{$cnr} = 'InProgress';
 		}
 		else
 		{
 			$this->RegisteredCourses->{$term} = new stdClass();
-			$this->RegisteredCourses->{$term}[$cnr] = 'InProgress';
+			$this->RegisteredCourses->{$term}->{$cnr} = 'InProgress';
 		}
 	}
 	
@@ -146,10 +169,6 @@ class Student extends User
 		}
 		else
 			throw new Exception("Student not found");;
-	}
-	public function GetSchedule()
-	{
-		
 	}
 
 }

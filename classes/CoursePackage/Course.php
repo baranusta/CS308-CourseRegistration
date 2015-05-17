@@ -31,7 +31,7 @@ class Course
 		$this->shortName = $row["classCode"];
 		$this->capacity = $row["capacity"];
 		$this->actual = 0;
-		$this->credits = 3;
+		$this->credits = $row["credit"];
 		$this->section = $row["section"];
 		$this->term = $Term;
 		//$this->prerequisites = $row["prereq"];
@@ -175,12 +175,13 @@ class Course
 						".$this->credits." Credits
 						<br>";
 		
-		return $wholeItem."<br>";
+		return $wholeItem."____________________________________________________________<br><br>";
 	}
 	
 	public function GetJSON()
 	{
 		return "   [{\"cnr\" : \"$this->cnr\", 
+					\"shortName\" : ".json_encode($this->shortName).",
 					\"schedule\" : ".json_encode($this->schedules).",
 					\"prerequisites\" : ".json_encode($this->prerequisites)."}]"
 					/*\"students\" : ".json_encode($this->students).",
@@ -212,8 +213,17 @@ class Course
 		return $this->schedules;
 	}
 	
+	public function getShortName()
+	{
+		return $this->shortName;
+	}
+	
 	public function getCNR(){
 		return $this->cnr;
+	}
+	
+	public function getGrade(){
+		return $this->grades;
 	}
 	
 }

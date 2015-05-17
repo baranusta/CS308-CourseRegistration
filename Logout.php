@@ -2,5 +2,5 @@
 session_start();
 session_destroy();
 
-header("location:login_success.php");
+header("location:main_login.php");
 ?>
