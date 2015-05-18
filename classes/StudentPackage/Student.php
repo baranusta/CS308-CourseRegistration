@@ -1,7 +1,7 @@
 <?php
-include_once 'PersonalInfo.php';
+/* include_once 'PersonalInfo.php';
 include_once 'Courses.php';
-include_once 'Request.php';
+include_once 'Request.php'; */
 
 class Student extends User
 {

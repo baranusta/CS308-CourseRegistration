@@ -1,10 +1,11 @@
 <?php
 class User
 {
-	var $id;
+
+/* 	var $id;
 	function User($ID)
 	{
-		$this->id = $ID;
-	}
+		//$this->id = $ID;
+	} */
 }
 ?>

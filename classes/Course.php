@@ -45,6 +45,9 @@ class Course
 		}
 		$this->grades = array("id" => 0, "grade" => "wow"); 
 	}
+	
+
+	
 	public function addCourse($course)
 	{
 		DBFunctions::SetRemoteConnection();	

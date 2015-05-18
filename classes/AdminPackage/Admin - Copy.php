@@ -106,7 +106,7 @@ class Admin extends User
 		{
 			$registeredCourseArray = $student['registered_courses'];//get json of courses
 			$registeredCourseArray = json_decode($registeredCourseArray, true);
-	var_dump($registeredCourseArray);
+
 			if(in_array($courseCNR, $registeredCourseArray[(int)$term]))//if array has the cnr in wanted term
 			{
 				$key = array_search($courseCNR, $registeredCourseArray[(int)$term]);//find the key of the cnr code in term
@@ -159,26 +159,19 @@ class Admin extends User
 	
 	public function DeleteUserById($userIdArray)
 	{
-		DBFunctions::SetRemoteConnection();
-		if(gettype($userIdArray) == "string")
-		{
-			$userInfoArray = array();//empty array
-			$userInfoArray = array($userIdArray);
-		}
 		
-		//var_dump($userIdArray);
+		$userInfoArray = array();//empty array
 		foreach($userIdArray as&$userId)
 		{
-			
 			$query = "SELECT * FROM schedule.user WHERE user_id = $userId;";//every user have unique id
 			$checkUser = mysql_fetch_array(mysql_query($query));
 			if($checkUser['type'] == "P")
 			{
-				$this->DeleteProf($checkUser['user_id']);
+				DeleteProf($checkUser['user_id']);
 			}
 			else if($checkUser['type'] == "S")
 			{
-				$this->deleteStudent($checkUser['user_id']);
+				deleteStudent($checkUser['user_id']);
 			}
 			else if($checkUser['type'] == "A")
 			{
@@ -322,7 +315,6 @@ class Admin extends User
 	
 	public function ListAllUsers($type)
 	{
-		$type = 'P';
 		$con = new DBFunctions;
 		$con->SetRemoteConnection();
 		$resultSet;
@@ -344,7 +336,7 @@ class Admin extends User
 		{
 			array_push($allUserArray,$row);
 		} */
-		$allUserArray = $this->GetPersonalInfoById(null,$resultSet);
+		$allUserArray = GetInfoById(null,$resultSet);
 		
 		return $allUserArray;
 		

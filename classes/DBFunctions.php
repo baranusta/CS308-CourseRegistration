@@ -13,6 +13,9 @@ class DBFunctions
 		$db_name="CS308"; 
 		$conn = mysql_connect("$host", "$username", "$password")or die("cannot connect"); 
 		mysql_select_db("$db_name")or die("cannot select DB");
+		
+		mysql_query("SET NAMES utf8");
+		mysql_query("SET CHARACTER SET utf8");
 		return $conn;
 	}
 	public static function SetRemoteConnection()
@@ -21,6 +24,10 @@ class DBFunctions
 		if (!self::$conn) {
 			die('Connect Error ('.mysql_error().')');
 		}
+		
+		mysql_query("SET NAMES utf8");
+		mysql_query("SET CHARACTER SET utf8");
+		
 	}
 	public static function CloseConnection()
 	{

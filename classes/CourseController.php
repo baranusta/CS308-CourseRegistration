@@ -85,6 +85,24 @@ class CoursesController
 		return $AllCourses;
 	}
 	
+		//retrieves all courses as array from wanted term
+	public function getTermCoursesArray($term)
+	{
+		DBFunctions::SetRemoteConnection();	
+		$query = "SELECT * FROM schedule.courses$term;";		
+		$resultSet = mysql_query($query);
+		$courses = array();
+		
+		while($row = mysql_fetch_array($resultSet))
+		{
+			array_push($courses, $row);
+		}
+		
+		DBFunctions::CloseConnection();
+		
+		return $courses;
+		
+	}
 	
 }
 ?>
