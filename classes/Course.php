@@ -22,7 +22,14 @@ class Course
 	private $students;
 	private $grades;
 	
-	public function __construct($row,$Term )
+	
+	public function __construct()
+	{
+		//default constructor for using functions
+	}
+	
+	
+	public function createInstance($row,$Term )
 	{
 		$this->cnr = $row["cnr"];
 		$this->longName = $row["longName"];
@@ -46,7 +53,16 @@ class Course
 		$this->grades = array("id" => 0, "grade" => "wow"); 
 	}
 	
-
+	public function getCourseByTerm($term, $cnr)
+	{
+		DBFunctions::SetRemoteConnection();	
+		$query = "SELECT * FROM schedule.courses$term WHERE cnr = '$cnr';";
+		$resultSet = mysql_query($query);
+		$row = mysql_fetch_array($resultSet);
+		DBFunctions::CloseConnection();
+		return $row;
+	}
+	
 	
 	public function addCourse($course)
 	{
