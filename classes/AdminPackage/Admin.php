@@ -41,10 +41,7 @@ class Admin extends User
 		$AdminCourseController;
 	}
 	
-	public function DeleteCourse($Course)
-	{
-		//need to delete course from student also
-	}
+
 	
 	public function ModifyUserInfo()
 	{
@@ -194,6 +191,7 @@ class Admin extends User
 				
 			}
 		}
+	}
 	}
 	
 	

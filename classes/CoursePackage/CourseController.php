@@ -143,7 +143,7 @@ class CoursesController
 		$result = mysql_query($sql);
 		DBFunctions::CloseConnection();
 		return $result;
-	
+	}
 		//retrieves all courses as array from wanted term
 	public function getTermCoursesArray($term)
 	{
