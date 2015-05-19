@@ -128,18 +128,19 @@ class Request
 		$requestArray = json_decode($row['request'], true);
 
 		//if the value is empty
-		$requestArray = $row['request'];
+		//$requestArray = $row['request'];
 		if($requestArray  == NULL)
 		{
 			$requestArray = array();
 		}
-
+		var_dump($requestArray);
 		//add value to the array
 		array_push($requestArray, $reqId);
 		$requestArray = json_encode($requestArray, JSON_FORCE_OBJECT);
 		
 		//update
 		$query = "UPDATE `schedule`.`student` SET `request`='$requestArray' WHERE `stu_id`='$stuId';";
+		
 		mysql_query($query);
 		
 	}
@@ -151,9 +152,9 @@ class Request
 		$resultSet = mysql_query($query);
 		$row = mysql_fetch_array($resultSet);
 
-		$requestArray = json_encode($row['requests'], true);
+		$requestArray = json_decode($row['requests'], true);
 
-		$requestArray = $row['requests'];
+		//$requestArray = $row['requests'];
 
 		//if the value is empty
 		if($requestArray  == NULL)
