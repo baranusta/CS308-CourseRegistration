@@ -4,6 +4,9 @@
 set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\xampp\htdocs\CS308-CourseRegistration\classes');
 include_once 'CoursePackage\CourseController.php';
 include_once 'User.php';
+/* include_once 'PersonalInfo.php';
+include_once 'Courses.php';
+include_once 'Request.php'; */
 
 class Student extends User
 {
