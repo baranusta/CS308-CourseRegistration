@@ -20,7 +20,7 @@ class CoursesController
 		$AllJSON ="";
 		foreach($AllCourses as $Course)
 		{
-			$wholeString .= $Course->GetPageItem();
+			$wholeString .= $Course->GetPageItem($_SESSION["ActiveTerm"]==$term);
 			$AllJSON.= "\"".$Course->getCNR()."\":".$Course->getJSON().",";
 		}
 		$json = $AllJSON;

@@ -61,24 +61,7 @@ class Course
 		}
 		if(isset($row["registeredStudents"]))
 		{
-			$this->studenteArr = $row["registeredStudents"];
-			$Arr = explode(",",$this->studenteArr);
-			$this->students = array();
-			foreach($Arr as $elm){
-				if($elm){
-					
-					$studentInfo = explode(":",$elm);
-					try{
-					$student["id"] = $studentInfo[0];
-					$student["grade"] = $studentInfo[1];
-					}
-					catch(Exception $e){
-						echo $elm;
-						echo $studentInfo ;
-					}// echo implode(" ",$schedule);
-					array_push($this->students,$student);
-				}
-			}
+			$this->studenteArr = json_decode($row["registeredStudents"]);
 		}
 		
 		if(isset($row["prerequest"]))
@@ -150,10 +133,15 @@ class Course
 	for only one course.
 	Result of the function is the html Item
 	*/
-	public function GetPageItem()
+	public function GetPageItem($chekboxEnabled)
 	{
+		$wholeItem = "";
+		if($chekboxEnabled)
+		{
 		$wholeItem = "	<input type=\"checkbox\" name=\"cnr[]\" value=\"".$this->cnr."\">
-						<tr>
+						";
+		}
+		$wholeItem .=	"<tr>
 						<a >".$this->longName."</a>&nbsp;&nbsp;
 						<th class=\"ddlabel\" scope=\"row\">
 						</tr>
@@ -189,12 +177,9 @@ class Course
 	}
 	
 	public function registerStudent($stuId){
-		if(count($this->studentArr)==0)
-			$allStu = $stuId.":InProgress";
-		else
-			$allStu = $this->studentArr.",".$stuId.":InProgress";
+		$this->studentArr[$stuId] = "InProgress";
 		$sql =	"UPDATE schedule.courses".$this->term."
-				 SET registeredStudents = '$allStu'
+				 SET registeredStudents = '".json_encode($this->studentArr)."'
 				 WHERE cnr='$this->cnr'";
 				 
 		echo $sql;
@@ -224,6 +209,10 @@ class Course
 	
 	public function getGrade(){
 		return $this->grades;
+	}
+	
+	public function getCorequisites(){
+		return $this->corerequest;
 	}
 	
 }

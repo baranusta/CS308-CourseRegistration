@@ -25,9 +25,13 @@ class Student extends User
 		$this->RegisteredCourses = json_decode($row['registered_courses']);
 		$this->Requests = json_decode($row['request']);
 		$this->CoursesTaken = $this->GetAllCourses();
-		$this->formSchedule($currentTerm);
+		// foreach($this->CoursesTaken['201402'] as $key=> $var)
+		// {
+			// var_dump($key);
+			// echo '<br>';
+			// var_dump($var);
+		// }
 		
-		var_dump($CoursesNames);
 	}
 	
 	
@@ -69,21 +73,23 @@ class Student extends User
 		foreach($schedule as $eachDay)
 		{
 			$times = explode("-",$eachDay["time"]);
-			$start = explode(":",$times[0]);
-			$end = explode(":",$times[1]);
-			$startInd = intval($start[0])-8;
-			if($startInd<0)
-			{
-				$startInd += 12;
-			}
-			$endInd = intval($end[0])-8;
-			if($endInd<0)
-			{
-				$endInd += 12;
-			}
-			for($i = $startInd; $i<$endInd ; $i++)
-			{
-				$this->scheduleArr[$eachDay["day"]][$i] = $eachDay["place"].",".$cName;
+			if(count($times)>1){
+				$start = explode(":",$times[0]);
+				$end = explode(":",$times[1]);
+				$startInd = intval($start[0])-8;
+				if($startInd<0)
+				{
+					$startInd += 12;
+				}
+				$endInd = intval($end[0])-8;
+				if($endInd<0)
+				{
+					$endInd += 12;
+				}
+				for($i = $startInd; $i<$endInd ; $i++)
+				{
+					$this->scheduleArr[$eachDay["day"]][$i] = $eachDay["place"].",".$cName;
+				}
 			}
 		}
 	}
@@ -93,17 +99,32 @@ class Student extends User
 	}
 	
 	public function getBrowseCourseActionPage(){
-		return "StudentPackage\AddCourse.php";
+		$currentTerm = func_get_arg(0);
+		if($currentTerm)
+			return "StudentPackage\AddCourse.php";
+		else
+			return "StudentPackage\StudentAddDropPage.php";
 	}
 	
-	public function getSchedule(){
+	public function getSchedule($desiredTerm){
+		
+		$this->formSchedule($desiredTerm);
 		return $this->scheduleArr;
 	}
 	
 	public function getRegisteredCourses($term){
-		if(property_exists($this->RegisteredCourses, $term))
-			return $this->RegisteredCourses->{$term};
-		return $this->RegisteredCourses->{$term};
+		$CoursesNames = array();
+		foreach($this->CoursesTaken as $key=> $var)
+		{
+			if($key == $term){
+				foreach($var as $cnr => $Obj)
+				{
+					array_push($CoursesNames,array($Obj[$cnr."cnr"]->getShortName(),$Obj[$cnr."cnr"]->getCorequisites()));
+				}
+				return $CoursesNames;
+			}
+		}
+		
 	}
 	
 	public function getTakenCourses(){
@@ -122,7 +143,6 @@ class Student extends User
 		if(!$this->RegisteredCourses)
 			$this->RegisteredCourses = new stdClass();
 		if(property_exists($this->RegisteredCourses, $term)){
-			var_dump($this->RegisteredCourses->{$term});
 			$this->RegisteredCourses->{$term}->{$cnr} = 'InProgress';
 		}
 		else
@@ -130,6 +150,20 @@ class Student extends User
 			$this->RegisteredCourses->{$term} = new stdClass();
 			$this->RegisteredCourses->{$term}->{$cnr} = 'InProgress';
 		}
+		
+		$CourseRetriever = new CoursesController();
+		
+		$sqlwhere ="WHERE cnr =".$cnr;
+		$this->CoursesTaken[$term][$cnr] = $CourseRetriever->GetSearchedCourses($term,$sqlwhere);
+	}
+	
+	public function removeCourse($term,$cnr){
+		if(!$this->RegisteredCourses)
+			$this->RegisteredCourses = new stdClass();
+		if(property_exists($this->RegisteredCourses, $term)){
+			unset($this->RegisteredCourses->{$term}->{$cnr});
+		}
+		unset($this->CoursesTaken[$term][$cnr]);
 	}
 	
 	public function UpdateRegisteredCourseDB()

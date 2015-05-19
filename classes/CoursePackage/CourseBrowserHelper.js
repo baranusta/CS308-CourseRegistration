@@ -1,57 +1,18 @@
 	var CourseIsOk = true;
 	var checkedCourses = [];
-	var scheduleTable;
-	//SchedulePageLoader
-	$( document ).ready(function() {
-		scheduleTable = document.getElementById('schedule').rows;
-		for (var day in Schedule) {
-			if (Schedule.hasOwnProperty(day)) {
-				fillSchedule(scheduleTable,ReturnIndexOfDay(day),Schedule[day]);
-			}
-		}
-		
-			// console.log(TakenCourses);
-	});
-	
-	function fillSchedule(table,columnInd,day){
-		for (var hour in day) {
-			if (day.hasOwnProperty(hour)) {
-				table[parseInt(hour)+1].cells[columnInd].innerHTML  = day[hour].split(",")[1];
-			}
-		}
-	}
-	
-	function ReturnIndexOfDay(day){
-		switch(day){
-			case 'M':
-				return 0;
-			case 'T':
-				return 1;
-			case 'W':
-				return 2;
-			case 'R':
-				return 3;
-			case 'F':
-				return 4;
-			default:
-			break;
-		}
-	}
-	
-	
-	
-	
-	
-	
-	
 	
 	function valthisform()
 	{
-		var checkboxs=document.getElementsByName("cnr[]");
-		var isChecked = checkedCourses.length != 0;
-		if(isChecked)	return true;
-		else alert("Please check a checkbox");
-		return false;
+		if(SubmitAction){
+			var checkboxs=document.getElementsByName("cnr[]");
+			var isChecked = checkedCourses.length != 0;
+			if(isChecked)	return true;
+			else alert("Please check a checkbox");
+			return false;
+		}
+		else
+			return true;
+		
 	}
 	
 	$('input[type=checkbox]').change(
