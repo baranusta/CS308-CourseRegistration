@@ -9,6 +9,7 @@ session_start();
 	}
 	$withLocation = true;
 	$cTerm = $_SESSION['ActiveTerm'];
+	$schedule = $User->GetSchedule($cTerm);
 ?>
 
 <head>
@@ -24,8 +25,8 @@ th, td {
 <script src="../FillSchedule.js"></script>
 <script type="text/javascript">
 
-var Schedule = <?php echo json_encode($User->GetSchedule($cTerm)); ?>;
-var withLocation = <?php echo $withLocation; ?>;
+var Schedule = <?php echo json_encode($schedule); ?>;
+var withLocation = <?php echo json_encode($withLocation); ?>;
 
 </script>
 </head>
