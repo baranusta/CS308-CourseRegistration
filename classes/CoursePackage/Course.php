@@ -203,6 +203,16 @@ class Course
 		return $this->shortName;
 	}
 	
+	public function getLongName()
+	{
+		return $this->longName;
+	}
+	
+	public function getInstructor()
+	{
+		return $this->professor;
+	}
+	
 	public function getCNR(){
 		return $this->cnr;
 	}

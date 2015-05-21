@@ -7,7 +7,7 @@
 <body>
 <?php
 set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\xampp\htdocs\CS308-CourseRegistration\classes');
-include_once 'CourseController.php';
+include_once '../CoursePackage/CourseController.php';
 include_once 'AdminPackage/Admin.php';
 
 

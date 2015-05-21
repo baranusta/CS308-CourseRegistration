@@ -21,7 +21,8 @@ class Professor extends User
 		$this->Requests = array();
 	} */
 
-	
+	public function getFirstScreen(){}
+	public function getBrowseCourseActionPage(){}
 	
 }
 ?>

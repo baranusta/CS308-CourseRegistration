@@ -103,9 +103,9 @@ EOF;
 
 
 set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\xampp\htdocs\CS308-CourseRegistration\classes');
-include_once 'classes/CourseController.php';
-include_once 'classes/RequestPackage/RequestModel.php';
-include_once 'classes/Course.php';
+include_once '../CoursePackage/CourseController.php';
+include_once '../RequestPackage/RequestModel.php';
+include_once '../CoursePackage/Course.php';
 
 if(isset($_POST['studentReq']))
 {
@@ -158,14 +158,24 @@ if($_SESSION['type'] == "S")
 		
 		echo $tableUpProf;//html code
 		
-		$courseObject = new Course();//with empty constructor
+		$courseObject = new CoursesController;//with empty constructor
 		
 		foreach ($requestArray as &$request)
 		{
 			//returns the row the course
-			$courseInfo = $courseObject->getCourseByTerm($request['term'], $request['cnr']);
+			$courseArr = $courseObject->GetSearchedCourses($request['term'],"WHERE cnr =".$request['cnr']);
+			$courseInfo = $courseArr[$request['cnr']."cnr"];
 			$requestId = $request['request_id'];
-			$courseCNR = $courseInfo['cnr'];
+			$courseCNR = $courseInfo->getCNR();
+			$courseClassCode = $courseInfo->getShortName();
+			$courseSection = "0";//$courseInfo->getCNR();
+			$courseLongName = $courseInfo->getLongName();
+			$courseInstructor = $courseInfo->getInstructor()[0];
+			$requestType = $request['type_request'];
+			$requestStuMsg = $request['message_stu'];
+			$requestProfMsg = $request['message_prof'];
+			$requestAnswer = $request['answer'];
+			/* $courseCNR = $courseInfo['cnr'];
 			$courseClassCode = $courseInfo['classCode'];
 			$courseSection = $courseInfo['section'];
 			$courseLongName = $courseInfo['longName'];
@@ -173,7 +183,7 @@ if($_SESSION['type'] == "S")
 			$requestType = $request['type_request'];
 			$requestStuMsg = $request['message_stu'];
 			$requestProfMsg = $request['message_prof'];
-			$requestAnswer = $request['answer'];
+			$requestAnswer = $request['answer']; */
 		
 			
 			
@@ -223,21 +233,23 @@ else if($_SESSION['type'] == "P")
 	
 	echo $tableUpProf;//html code
 	
-	$courseObject = new Course();//with empty constructor
+	$courseObject = new CoursesController;//with empty constructor
 	
 	foreach ($requestArray as &$request)
 	{
 		//returns the row the course
-		$courseInfo = $courseObject->getCourseByTerm($request['term'], $request['cnr']);
-		$requestId = $request['request_id'];
-		$courseCNR = $courseInfo['cnr'];
-		$courseClassCode = $courseInfo['classCode'];
-		$courseSection = $courseInfo['section'];
-		$courseLongName = $courseInfo['longName'];
-		$courseInstructor = $courseInfo['instructors'];
-		$requestType = $request['type_request'];
-		$requestStuMsg = $request['message_stu'];
-		$requestProfMsg = $request['message_prof'];
+		$courseArr = $courseObject->GetSearchedCourses($request['term'],"WHERE cnr =".$request['cnr']);
+			$courseInfo = $courseArr[$request['cnr']."cnr"];
+			$requestId = $request['request_id'];
+			$courseCNR = $courseInfo->getCNR();
+			$courseClassCode = $courseInfo->getShortName();
+			$courseSection = "0";//$courseInfo->getCNR();
+			$courseLongName = $courseInfo->getLongName();
+			$courseInstructor = $courseInfo->getInstructor()[0];
+			$requestType = $request['type_request'];
+			$requestStuMsg = $request['message_stu'];
+			$requestProfMsg = $request['message_prof'];
+			$requestAnswer = $request['answer'];
 	
 		if($request['answer'] == "Pending...")
 		{
