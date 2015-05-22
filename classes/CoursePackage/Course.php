@@ -18,7 +18,7 @@ class Course
 	private $term;
 	private $credits;
 	private $prerequisites;
-	private $corerequest;
+	private $corequisites;
 	private $professor;
 	private $students;
 	private $studentArr;
@@ -35,7 +35,8 @@ class Course
 		$this->section = $row["section"];
 		$this->term = $Term;
 		//$this->prerequisites = $row["prereq"];
-		$this->corerequest = $row["corerequest"];
+		$this->prerequisites = $row["prerequest"];
+		$this->corequisites = $row["corerequest"];
 		//$this->schedules = $row["schedule"];
 		//$this->faculty = $row["faculty"];
 		$scheduleArr = $row["schedule"];
@@ -61,19 +62,19 @@ class Course
 		}
 		if(isset($row["registeredStudents"]))
 		{
-			$this->studenteArr = json_decode($row["registeredStudents"]);
+			$this->studentArr = json_decode($row["registeredStudents"]);
 		}
 		
-		if(isset($row["prerequest"]))
-		{
-			$Requisites = $row["prerequest"];
-			$Arr = explode(",",$Requisites);
-			$this->prerequisites = array();
-			foreach($Arr as $elm){
-				if($elm)
-					array_push($this->prerequisites,$elm);
-			}
-		}
+		// if(isset($row["prerequest"]))
+		// {
+			// $Requisites = $row["prerequest"];
+			// $Arr = explode(",",$Requisites);
+			// $this->prerequisites = array();
+			// foreach($Arr as $elm){
+				// if($elm)
+					// array_push($this->prerequisites,$elm);
+			// }
+		// }
 		
 		$this->professor = array();
 		$insNames = $row["instructors"];
@@ -171,13 +172,35 @@ class Course
 		return "   [{\"cnr\" : \"$this->cnr\", 
 					\"shortName\" : ".json_encode($this->shortName).",
 					\"schedule\" : ".json_encode($this->schedules).",
+					\"corequisites\" : ".json_encode($this->corequisites).",
 					\"prerequisites\" : ".json_encode($this->prerequisites)."}]"
 					/*\"students\" : ".json_encode($this->students).",
 					\"professor\" : \"$this->cnr\"}]"*/;
 	}
 	
 	public function registerStudent($stuId){
-		$this->studentArr[$stuId] = "InProgress";
+		$this->studentArr->{$stuId} = "InProgress";
+		$sql =	"UPDATE schedule.courses".$this->term."
+				 SET registeredStudents = '".json_encode($this->studentArr)."'
+				 WHERE cnr='$this->cnr'";
+				 
+		echo $sql;
+		DBFunctions::SetRemoteConnection();	
+		if(mysql_query($sql))
+		{
+			echo"SUCCESS!!";
+		}
+		else
+			echo"FAIL!!";
+		DBFunctions::CloseConnection();
+	}
+	
+	public function stuIsRegistered($stuId){
+		return property_exists($this->studentArr,$stuId);
+	}
+	
+	public function removeStudent($stuId){
+		unset($this->studentArr->{$stuId});
 		$sql =	"UPDATE schedule.courses".$this->term."
 				 SET registeredStudents = '".json_encode($this->studentArr)."'
 				 WHERE cnr='$this->cnr'";
@@ -222,8 +245,7 @@ class Course
 	}
 	
 	public function getCorequisites(){
-		return $this->corerequest;
+		return $this->corequisites;
 	}
-	
 }
 ?>

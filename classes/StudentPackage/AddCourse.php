@@ -8,11 +8,18 @@ if(!empty($_POST['cnr']))
 		if(!isset($_SESSION)){
 			session_start();
 		}
-        $_SESSION['myUser']->registerToCourse($_SESSION['term'],$course);
+		$name = $_SESSION["AllCourses"][$course.'cnr']->getShortName();
+		$isCoreq = false; 
+		
+		foreach($_POST['cnr'] as $corCheck){
+			if($_SESSION["AllCourses"][$corCheck.'cnr']->getCorequisites() == $name)
+				$isCoreq |= true;
+		}
+		$_SESSION['myUser']->registerToCourse($_SESSION['term'],$name,$course,$isCoreq);
 		$_SESSION["AllCourses"][$course."cnr"]->registerStudent($_SESSION['myUser']->getId());
     }
 	$_SESSION['myUser']->UpdateRegisteredCourseDB();
-header("location:StudentAddDropPage.php");
+	header("location:StudentAddDropPage.php");
 }
 else{
 }

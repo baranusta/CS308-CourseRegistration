@@ -1,13 +1,29 @@
 	var CourseIsOk = true;
 	var checkedCourses = [];
+	var CorequisiteArr = {};
 	
 	function valthisform()
 	{
 		if(SubmitAction){
-			var checkboxs=document.getElementsByName("cnr[]");
 			var isChecked = checkedCourses.length != 0;
-			if(isChecked)	return true;
-			else alert("Please check a checkbox");
+			if(isChecked){
+				//if there is a course that coreq is not taken
+				for(var elms in CorequisiteArr){
+					var isTaken = false;
+					for(var taken in checkedCourses){
+						if(CorequisiteArr[elms] == checkedCourses[taken]){
+							isTaken = true;
+						}
+					}
+					if(!istaken){
+						alert("Corequisite is not taken");
+						return false;
+					}
+				}
+				return true;
+			}
+			else 
+				alert("Please check a checkbox");
 			return false;
 		}
 		else
@@ -32,14 +48,16 @@
 					}
 				}
 				else{
-					
+					if(!checkCorequisiteOk(Courses[this.value][0])){
+						alert("You need to take " + Courses[this.value][0]["corequisites"] + " before submit.");
+						CorequisiteArr[Courses[this.value][0]] = Courses[this.value][0]["corequisites"];
+					}
 				}
 			}
 			else{
 				
 				CourseIsOk &= false;
 			}
-			console.log(CourseIsOk);
 			if(CourseIsOk)
 			{
 				checkedCourses.push(Courses[this.value][0]);
@@ -52,6 +70,8 @@
         }
 		else
 		{
+			if(CorequisiteArr.hasOwnProperty(Courses[this.value][0]))
+				delete CorequisiteArr[Courses[this.value][0]];
 			var index = checkedCourses.indexOf(Courses[this.value][0]);
 			if (index > -1) {
 				checkedCourses.splice(index, 1);
@@ -60,33 +80,50 @@
 		}
     });
 	
-	function checkPrerequisiteOk(Obj){
-		var courseFound = false;
-		for (var term in TakenCourses) {
-			for(var course in TakenCourses[term]){
-				if(Obj['prerequisites'] == course["shortName"])
+	function checkCorequisiteOk(Obj){
+		if(Obj['corequisites'].length > 0){
+			for (var course in RegisteredCourses) {
+				if(Obj['corequisites'] == RegisteredCourses[course][0])
 				{
-					if(TakenCourses[term][course]["grade"].length>2){
-						alert("Prerequisite is not completed");
-						return true;
-					}
-					else if(TakenCourses[term][course]["grade"].length==1 && TakenCourses[term][course]["grade"]<='D')
-					{
-						alert("Prerequisite grade is not sufficient");
-						return true;	
-					}
-					courseFound = true;
+					return true;
 				}
 			}
 		}
-		//if program comes to that point
-		// case1: Course found but not sufficient grade
-		// case2: CourseNotFound
-		return !courseFound;
+		else
+			return true;
+		return false;
 	}
 	
-	function checkCorequisiteOk(Obj){
-		//Corequisites should not be checked at that stage. We will check this if user submits
+	function checkPrerequisiteOk(Obj){
+		var courseFound = false;
+		console.log(Obj);
+		if(Obj['prerequisites'].length > 0){
+			for(var course in TakenCourses){
+				if(CurrentTerm != course){
+					for(var cnr in TakenCourses[course]){
+				
+		console.log(TakenCourses[course][cnr].shortName);
+						if(Obj['prerequisites'] == TakenCourses[course][cnr].shortName)
+						{
+							if(TakenCourses[term][course]["grade"].length>2){
+								alert("Prerequisite is not completed");
+								courseFound = false;
+							}
+							else if(TakenCourses[term][course]["grade"]=='F')
+							{
+								alert("Prerequisite grade is not sufficient");
+								courseFound = false;	
+							}
+						}
+					}
+				}
+			}
+		}
+		else
+			return true;
+
+		alert("Prerequisite has not been taken");
+		return false;
 	}
 	
 	function checkScheduleOk(Obj){
@@ -102,9 +139,9 @@
 	}
 	
 	function AddToTable(Obj){
-		console.log(Schedule);
 		iterOverSchedule(Obj,function(day,hour,place,name){
 			scheduleTable[parseInt(hour)+1].cells[ReturnIndexOfDay(day)].innerHTML  = name;
+			
 			if(!Schedule.hasOwnProperty(day))
 				Schedule[day] = {};
 			Schedule[day][hour] = place + "," + name;
@@ -113,7 +150,6 @@
 	}
 	
 	function DeleteFromTable(Obj){
-		console.log(Schedule);
 		iterOverSchedule(Obj,function(day,hour,place,name){
 			scheduleTable[parseInt(hour)+1].cells[ReturnIndexOfDay(day)].innerHTML = "";
 			delete Schedule[day][hour];
@@ -137,7 +173,7 @@
 				EndTime+=12;
 			
 				for(var j = StartTime; j<EndTime ;j++){
-					courseScheduleOk = whatToDo(Day,j,Obj.schedule[i]["place"],Obj["shortName"]);
+					courseScheduleOk &= whatToDo(Day,j,Obj.schedule[i]["place"],Obj["shortName"]);
 				}
 			}
 		}

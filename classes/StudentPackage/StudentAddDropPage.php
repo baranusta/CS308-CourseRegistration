@@ -28,8 +28,9 @@ th, td {
 <script type="text/javascript">
 
 
-var RegisteredCourses = <?php echo json_encode($User->getRegisteredCourses($term)); ?>;
+var RegisteredCourses = <?php echo json_encode($User->getTakenCoursesInfo($term)); ?>;
 var Schedule = <?php echo json_encode($User->GetSchedule($term)); ?>;
+console.log(Schedule);
 var withLocation = <?php echo json_encode($withLocation); ?>;
 
 </script>
@@ -139,7 +140,7 @@ var withLocation = <?php echo json_encode($withLocation); ?>;
 </form>
 <div style="position:relative; top:30; left: 50;">
 All Courses
-<form action="../CoursePackage/CourseFilterPage.php" >
+<form action="DropCourse.php" method="post" onsubmit= "return valthisform();">
 <div id="takenCourses">
 </div>
 <div id="ActionButton">

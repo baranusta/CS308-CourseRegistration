@@ -12,11 +12,11 @@ class Student extends User
 {
 	private $Major;
 	private $EnteredYear;
-	private $TakenCourses;
+	private $TakenCourses;//taken courses So far grade is in there
 	private $RegisteredCourses;
 	private $PersonalInf;
 	private $Requests;
-	private $CoursesTaken;
+	private $CoursesTaken;//All course Objects
 	private $scheduleArr;
 	
 	public function __construct($id,$currentTerm)
@@ -34,7 +34,6 @@ class Student extends User
 			// echo '<br>';
 			// var_dump($var);
 		// }
-		
 	}
 	
 	
@@ -56,18 +55,22 @@ class Student extends User
 	}
 	
 	public function formSchedule($term){
-		if(array_key_exists($term,$this->CoursesTaken))
+		if(isset($term,$this->CoursesTaken))
 		{
 			$Courses = $this->CoursesTaken[$term];
+			if(count($Courses)==0){
+				return false;
+			}
 			foreach($Courses as $key=>$value)
 			{
 				$schedule = $value[$key."cnr"]->getSchedule();
 				$courseName = $value[$key."cnr"]->getShortName();
 				$this->fillSchedule($schedule,$courseName);
 			}
+			return true;
 		}
 		else
-			echo $term."There is not any course taken for this term";
+			return false;
 		
 	}
 	
@@ -110,19 +113,22 @@ class Student extends User
 	}
 	
 	public function getSchedule($desiredTerm){
-		
-		$this->formSchedule($desiredTerm);
-		return $this->scheduleArr;
+		unset($this->scheduleArr);
+		if($this->formSchedule($desiredTerm))
+		{
+			return $this->scheduleArr;
+		}
+		return array();
 	}
 	
-	public function getRegisteredCourses($term){
+	public function getTakenCoursesInfo($term){
 		$CoursesNames = array();
 		foreach($this->CoursesTaken as $key=> $var)
 		{
 			if($key == $term){
 				foreach($var as $cnr => $Obj)
 				{
-					array_push($CoursesNames,array($Obj[$cnr."cnr"]->getShortName(),$Obj[$cnr."cnr"]->getCorequisites()));
+					array_push($CoursesNames,array($Obj[$cnr."cnr"]->getShortName(),$Obj[$cnr."cnr"]->getLongName(),$Obj[$cnr."cnr"]->getSchedule(),$Obj[$cnr."cnr"]->getCNR()));
 				}
 				return $CoursesNames;
 			}
@@ -130,30 +136,22 @@ class Student extends User
 		
 	}
 	
-	public function getTakenCourses(){
+	public function getTakenCoursesGrade(){
 		$CoursesNames = array();
-		foreach($this->CoursesTaken as $key=> $var)
-		{
-			foreach($var as $cnr => $Obj)
-			{
-				array_push($CoursesNames,array($Obj[$cnr."cnr"]->getShortName()=>$Obj[$cnr."cnr"]->getGrade()));
-			}
-		}
-		return $CoursesNames;
+		return $this->RegisteredCourses;
 	}
 	
-	public function registerToCourse($term,$cnr){
+	public function registerToCourse($term,$name,$cnr,$mode){
+		
 		if(!$this->RegisteredCourses)
 			$this->RegisteredCourses = new stdClass();
-		if(property_exists($this->RegisteredCourses, $term)){
-			$this->RegisteredCourses->{$term}->{$cnr} = 'InProgress';
-		}
-		else
-		{
+		if(!property_exists($this->RegisteredCourses, $term)){
 			$this->RegisteredCourses->{$term} = new stdClass();
-			$this->RegisteredCourses->{$term}->{$cnr} = 'InProgress';
 		}
-		
+		if($mode)
+			$this->RegisteredCourses->{$term}->{$cnr} = array("shortName"=>$name,"grade"=>"InProgress");
+		else
+			$this->RegisteredCourses->{$term}->{$cnr} = array("shortName"=>$name,"grade"=>"nope");
 		$CourseRetriever = new CoursesController();
 		
 		$sqlwhere ="WHERE cnr =".$cnr;
@@ -166,14 +164,15 @@ class Student extends User
 		if(property_exists($this->RegisteredCourses, $term)){
 			unset($this->RegisteredCourses->{$term}->{$cnr});
 		}
+		$CourseRemover = new CoursesController();
+		$CourseRemover->removeStudentFromCourse($this->CoursesTaken[$term][$cnr][$cnr."cnr"],$this->id);
 		unset($this->CoursesTaken[$term][$cnr]);
 	}
 	
 	public function UpdateRegisteredCourseDB()
 	{
-		
+		// var_dump($this->RegisteredCourses."lol");
 		$json = json_encode($this->RegisteredCourses);
-		
 		$sql = "UPDATE schedule.student SET registered_courses='".$json."' WHERE stu_id='$this->id';";
 		DBFunctions::SetRemoteConnection();
 		$result=mysql_query($sql);

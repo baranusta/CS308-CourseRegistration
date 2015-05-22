@@ -45,6 +45,7 @@ else
 	//if there is any course,
 	$withLocation = false;
 	//TO-DO
+	
 	//form action part has to be edited.
 	$User = $_SESSION['myUser'];
 	$action = "..\\".$User->getBrowseCourseActionPage($cTerm==$term); 
@@ -70,10 +71,15 @@ th, td {
 <script src="../FillSchedule.js"></script>
 <script type="text/javascript">
 
-var TakenCourses = <?php echo json_encode($User->GetTakenCourses()); ?>;
+
+var RegisteredCourses = <?php echo json_encode($User->getTakenCoursesInfo($cTerm)); ?>;
+var TakenCourses = <?php echo json_encode($User->getTakenCoursesGrade()); ?>;
 var Schedule = <?php echo json_encode($User->GetSchedule($term)); ?>;
+if(Schedule==null)
+	Schedule = {};
 var withLocation = <?php echo json_encode($withLocation); ?>;
 var SubmitAction = <?php echo json_encode($cTerm==$term); ?>;
+var CurrentTerm = <?php echo json_encode($cTerm); ?>;
 var Courses = <?php echo json_encode($json); ?>;
 Courses = JSON.parse(Courses);
 

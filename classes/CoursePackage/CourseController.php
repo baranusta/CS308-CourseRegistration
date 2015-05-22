@@ -162,5 +162,10 @@ class CoursesController
 		return $courses;
 	}
 	
+	public function removeStudentFromCourse($Course,$StuId){
+		if($Course->stuIsRegistered($StuId))
+			$Course->removeStudent($StuId);
+	}
+	
 }
 ?>

@@ -1,6 +1,22 @@
 
 
-
+	var CorequisiteArr = {};
+	var checkedCourses = [];
+	function valthisform(){
+		for(var elms in CorequisiteArr){
+					var isDropped = false;
+					for(var taken in checkedCourses){
+						if(CorequisiteArr[elms] == checkedCourses[taken]){
+							isTaken = true;
+						}
+					}
+					if(!istaken){
+						alert("Corequisite is not taken");
+						return false;
+					}
+				}
+	}
+	
 $( document ).ready(function() {
 	console.log(RegisteredCourses);
 	for(var Course in RegisteredCourses)
@@ -8,12 +24,16 @@ $( document ).ready(function() {
 		var myDiv = document.getElementById("takenCourses");
 		var checkbox = document.createElement("input"); 
 		checkbox.setAttribute("type", "checkbox");
-		checkbox.setAttribute("name", "dd");
-		checkbox.setAttribute("value", RegisteredCourses[Course][0]);
+		checkbox.setAttribute("name", "cnr[]");
+		checkbox.setAttribute("value", RegisteredCourses[Course][3]);
 		myDiv.appendChild(checkbox); 
 		var newlabel = document.createElement("Label");
-		newlabel.setAttribute("for",RegisteredCourses[Course][0]);
-		newlabel.innerHTML = RegisteredCourses[Course][0]+"<br>";
+		newlabel.setAttribute("for",RegisteredCourses[Course][3]);
+		var schedule = "";
+		for(var each in RegisteredCourses[Course][2]){
+			schedule += RegisteredCourses[Course][2][each].day + ": " + RegisteredCourses[Course][2][each].time + " ";
+		}
+		newlabel.innerHTML = RegisteredCourses[Course][0] +"  " + RegisteredCourses[Course][1]+"<br>" + schedule +  "<br><br>";
 		myDiv.appendChild(newlabel);
 		// do this after you append it
 		checkbox.checked = false; 
@@ -23,45 +43,38 @@ $( document ).ready(function() {
 	
 $('input[type=checkbox]').change(
     function(){
+		console.log("up");
         if (this.checked) {
-			CourseIsOk = true;
-			if(checkPrerequisiteOk(Courses[this.value][0]))
+			if(!checkCorequisiteOk(Courses[this.value][0]))
 			{
-				if(!checkScheduleOk(Courses[this.value][0]))
-				{
-					CourseIsOk &= false;
-					alert("Time Conflict");
-					for (var i = 0, row; row = scheduleTable[i]; i++) {
-						for (var j = 0, col; col = row.cells[j]; j++) {
-							col.style.backgroundColor = "white";
-						}  
-					}
-				}
-				else{
-					
-				}
-			}
-			else{
-				
-				CourseIsOk &= false;
-			}
-			console.log(CourseIsOk);
-			if(CourseIsOk)
-			{
+				alert("Please drop also" + Courses[this.value][0]["corequisites"] + "of that course");
+				CorequisiteArr[Courses[this.value][0]] = Courses[this.value][0]["corequisites"];
 				checkedCourses.push(Courses[this.value][0]);
-				AddToTable(Courses[this.value][0]);
-			}
-			else
-			{	
-				this.checked = false;
 			}
         }
 		else
 		{
-			var index = checkedCourses.indexOf(Courses[this.value][0]);
-			if (index > -1) {
-				checkedCourses.splice(index, 1);
-			}
-			DeleteFromTable(Courses[this.value][0]);
+			checkedCourses.push(Courses[this.value][0]);
+			if(CorequisiteArr.hasOwnProperty(Courses[this.value][0]))
+				delete CorequisiteArr[Courses[this.value][0]];
 		}
     });
+	
+	
+	function checkCorequisiteOk(Obj){
+		if(Obj['corequisites'].length > 0){
+			for (var course in RegisteredCourses) {
+				console.log(RegisteredCourses[course]);
+				
+				console.log(Obj['corequisites']);
+				if(Obj['corequisites'] == RegisteredCourses[course][0])
+				{
+					return false;
+				}
+			}
+		}
+		else
+			return true;
+		return false;
+	}
+	
