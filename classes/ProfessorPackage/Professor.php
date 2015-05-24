@@ -1,26 +1,39 @@
 <?php
-//include_once 'PersonalInfoPackage/PersonalInfo.php';
-//include_once 'Courses.php';
-//include_once 'RequestPackage/Request.php';
-include_once 'User.php';
+include_once '../PersonalInfoPackage/PersonalInfo.php';
+include_once '../User.php';
+//include_once '../Course.php';
+//include_once '../RequestPackage/Request.php';
 
 class Professor extends User
 {
-	private $Department;
-	private $GivenCourses;
-	private $RegisteredCourses;
-	private $PersonalInf;
-	private $Requests;
+	protected $GivenCourses;
+	protected $RegisteredCourses;
+	protected $PersonalInf;
+	protected $Requests;
 	
-	public function __construct($persInf, $fac = null, $major = null)
+<<<<<<< HEAD
+	public function __construct($persInf)
+=======
+/* 	public function __construct($persInf, $fac = null, $major = null)
+>>>>>>> 969dd098439105cbfcf933289b2c67def48445d8
 	{
 		$this->PersonalInf = $persInf;
-		$this->Faculty = $fac;
-		$this->Major = $major;
+		$this->RegisteredCourses = array ();
 		$this->GivenCourses = array();
 		$this->Requests = array();
+<<<<<<< HEAD
 	}
 	
+	public function getFirstScreen()
+	{}
+	public function getBrowseCourseActionPage()
+	{}
+=======
+	} */
+
+	public function getFirstScreen(){}
+	public function getBrowseCourseActionPage(){}
 	
+>>>>>>> 969dd098439105cbfcf933289b2c67def48445d8
 }
 ?>

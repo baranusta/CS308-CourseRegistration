@@ -1,15 +1,5 @@
 <?php
-set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\wamp\www\CS308-CourseRegistration\classes\AdminPackage');
-// include_path=".;C:\xampp\htdocs\CS308-CourseRegistration\classes";
-// include_once 'Courses.php';
-// include_once 'RequestPackage/Request.php';
-include_once '../ProfessorPackage/Professor.php';
-include_once '../StudentPackage/Student.php';
-include_once '../PersonalInfoPackage/PersonalInfo.php';
-include_once '../User.php';
-include_once 'AdminUserController.php';
-include_once 'AdminUserDB.php';
-//set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\xampp\htdocs\CS308-CourseRegistration\classes');
+set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\xampp\htdocs\CS308-CourseRegistration\classes');
 
 //include_once 'Courses.php';
 //include_once 'RequestPackage\Request.php';
@@ -20,86 +10,14 @@ include_once 'DBFunctions.php';
 
 class Admin extends User
 {	
-	public function getFirstScreen()
-	{}
-	public function getBrowseCourseActionPage()
-	{}
-	public function AddUser()
+	
+
+
+	
+	public function AddUser($User)
 	{
-		function returnBack ()
-		{
-			echo "<br>Click Back to return the previous page";
-			echo "<html>";
-			echo "<form action = \"addUser.php\">";
-			echo "<tr><td> <INPUT TYPE = \"Submit\" Name = \"SubmitButton\" VALUE =\"Back\"> </td></tr>";
-			echo "</form>";
-			echo "</html>";
-		}
-		
-		if (!empty ($_POST['username'])) //check if the "username" blank is filled, if not gives an error
-		{
-			$username = $_POST['username']; //gets the username
-			
-			// query the database for the recently taken username
-			// if such an user already exists, further functions are not allowed.
-			DBFunctions::SetRemoteConnection();
-			$query = "SELECT username FROM schedule.user where schedule.user.username = \"$username\"";
-			$result = mysql_query($query);
-			$numrows = mysql_num_rows($result); 
-			DBFunctions::CloseConnection();
-			
-			if ($result) 
-			{
-				if ($numrows != 0) 
-				{
-					echo "User with the username, ".$username.", already exists";
-					returnBack();
-				}
-				else 
-				// if there is no such user takes all the general personal info
-				// then based on the type of the user to be added (Admin/Stu/Prof), records the type based relevant info
-				{			
-					$formType = $_POST['formType'];
-					$password = "su1234";
-					$name = $_POST['name'];
-					$lastname = $_POST['lastname'];
-					$address = $_POST['address'];
-					$enterYear = $_POST['yearEntered'];
-					$telNO = $_POST['telNO'];
-					$faculty = $_POST['faculty'];
-					
-					$user = new User ($username, $password, $formType); //create user
-					$personalInfo = new PersonalInfo ($name, $lastname, $enterYear, $address, null, $telNO, $faculty); //create the personal info of the users (only for stu and prof)
-					$adminUController = new AdminUserController;
-					
-					if ($formType == 'A')
-					{
-						$adminUController->AddUser($user, null, null, null);
-					}
-					elseif ($formType == 'P')
-					{
-						$prof = new Professor ($personalInfo);
-						$adminUController->AddUser($user, $personalInfo, null, null);
-					} 
-					elseif ($formType == 'S')
-					{
-						$major = $_POST['major'];
-						$gradYear = $_POST['gradYear'];
-						
-						$adminUController->AddUser($user, $personalInfo, $gradYear, $major);
-					}
-					
-					
-				}
-			} 
-		}
-		
-		else{
-			
-			echo "ERROR!!! USERNAME is not entered.";
-			returnBack ();
-		}
-		
+		$AdminController;
+		//DB li bişiler çözcez
 	}
 	
 	public function DeleteUser($User)
@@ -125,75 +43,49 @@ class Admin extends User
 	
 	public function ModifyUserInfo()
 	{
-		// $adUserController = new AdminUserController;
-		// $adUserController->ModifyUserInfo(); 
-		
-		$aduserDB = new AdminUserDB;
-		$aduserDB->ModifyUserInfo();
+		//Nasıl yapcaımızı konuşmamız lazım.
 	}
 	
-	public function GetUserInfo()
+	
+
+	public function deleteStudent($userId)
 	{
-		function returnBack ()
-		{
-			echo "<br>Click Back to return the previous page";
+		$con = new DBFunctions;
+		$con->SetRemoteConnection();
 		
-			echo "<html>";
-			echo "<form action = \"getUser.php\">";
-			echo "<tr><td> <INPUT TYPE = \"Submit\" Name = \"SubmitButton\" VALUE =\"Back\"> </td></tr>";
-			echo "</form>";
-			echo "<tr></tr>";
-			echo "<form action = \"../../../homePage.html\">";
-			echo "<tr><td> <INPUT TYPE = \"Submit\" Name = \"SubmitButton\" VALUE =\"Home Page\"></td></tr>";
-			echo "</form>";
-			echo "</html>";
-		}
-
+		$query = "SELECT * FROM schedule.student WHERE stu_id= '$userId';";
+		$student = mysql_fetch_array(mysql_query($query));
 		
-		if (!empty ($_POST['username'])) //check if the "username" blank is filled, if not gives an error
+		$registeredCourseArray = $student['registered_courses'];//get json of courses
+		$registeredCourseArray = json_decode($registeredCourseArray, true);
+		
+		
+		$terms = array("201402", "201401", "201302", "201301", "201202", "201201", "201102", "201101", "201002", "201001");
+		foreach($terms as&$term)//search cnrs for each term
 		{
-			$username = $_POST['username']; //gets the username
-			$type = $_POST['formType'];
+			//echo '<br><br>TERM:'.$term.'<br>';
 			
-			// query the database for the recently taken username
-			// if such an user already exists, further functions are not allowed.
-			DBFunctions::SetRemoteConnection();
-			$query = "SELECT * FROM schedule.user where schedule.user.username = \"$username\"";
-			$result = mysql_query($query);
-			$numrows = mysql_num_rows($result); 
-			$row = mysql_fetch_array($result);
-						
-			if ($result) 
+			if(sizeof($registeredCourseArray[$term]) > 0)//if term has no cnr in it
 			{
-				if ($numrows == 0) 
+				foreach($coursesArray[$term] as&$courseCNR)//for each cnr
 				{
-					echo "User with the username, ".$username.", does not exist in the database.";
-					returnBack();
+					//decrease the actual student number
+					$query = "UPDATE schedule.courses$term SET actual = actual-1 WHERE cnr = '$courseCNR';";
+					mysql_query($query);
+					
 				}
-				else
-				{
-					if ($type != $row['type'])
-					{
-						echo "ERROR!!! ".$username." does not match with the type, (".$type.") you have entered.";
-						returnBack();
-					}
-					else
-					{
-						$adminUDB = new AdminUserDB;
-						$adminUDB->GetUserInfo($username, $type);
-					}					
-				}
-			}	
+			}
 		}
-		else{
-			
-			echo "ERROR!!! USERNAME is not entered.";
-			returnBack ();
-		}
+		//delete student from other tables
+		$query = "DELETE FROM schedule.student WHERE prof_id = '$userId';";
+		mysql_query($query);
+		$query = "DELETE FROM schedule.personalinfo WHERE user_id = '$userId';";
+		mysql_query($query);
+		$query = "DELETE FROM schedule.user WHERE user_id = '$userId';";
+		mysql_query($query);
 		
-		DBFunctions::CloseConnection();
-
-	}		
+	}
+	
 	
 	public function deleteCourseCourse($courseCNR, $term)
 	{
@@ -263,6 +155,8 @@ class Admin extends User
 		mysql_query($query);
 	}
 	
+	
+	
 	public function DeleteUserById($userIdArray)
 	{
 		
@@ -277,7 +171,7 @@ class Admin extends User
 			}
 			else if($checkUser['type'] == "S")
 			{
-				
+				deleteStudent($checkUser['user_id']);
 			}
 			else if($checkUser['type'] == "A")
 			{
@@ -286,6 +180,7 @@ class Admin extends User
 			
 		}
 	}
+	
 	
 	public function GetUserInfoById($userId, $resultSet)
 	{
@@ -436,9 +331,15 @@ class Admin extends User
 			exit;
 		}
 		
+		$allUserArray = array();
+	/* 	while($row = mysql_fetch_array($allUserArray))
+		{
+			array_push($allUserArray,$row);
+		} */
 		$allUserArray = GetInfoById(null,$resultSet);
 		
 		return $allUserArray;
+		
 	}
 }
 ?>
