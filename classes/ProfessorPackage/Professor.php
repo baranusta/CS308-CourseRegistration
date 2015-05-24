@@ -11,18 +11,31 @@ class Professor extends User
 	private $RegisteredCourses;
 	private $PersonalInf;
 	private $Requests;
+	private $term;
 	
-/* 	public function __construct($persInf, $fac = null, $major = null)
+	public function __construct($id, $term)
 	{
-		$this->PersonalInf = $persInf;
-		$this->Faculty = $fac;
-		$this->Major = $major;
+		$this->id = $id;
+		$this->term = $term;
 		$this->GivenCourses = array();
 		$this->Requests = array();
-	} */
-
-	public function getFirstScreen(){}
-	public function getBrowseCourseActionPage(){}
+	}
+	public function getID()
+	{
+		return $this->id;
+	}
+	public function getCurrentTerm()
+	{
+		return $this->term;
+	}
+	public function getFirstScreen()
+	{
+		header("location:classes\ProfessorPackage\ProfessorFirstPage.php");
+	}
 	
+	public function getBrowseCourseActionPage()
+	{
+		
+	}
 }
 ?>

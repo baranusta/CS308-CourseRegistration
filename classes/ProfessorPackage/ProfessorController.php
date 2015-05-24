@@ -25,6 +25,22 @@ class ProfessorController
 		}
 		
 	}
+	public function GetCourses($prof)
+	{
+		$prof_id = $prof->getID();
+		$term = $prof->getCurrentTerm();
+		$sql = "SELECT p.courses FROM schedule.professor p WHERE prof_id = '".$prof_id."' ";
+		DBFunctions::SetRemoteConnection();
+		$result = mysql_query($sql);
+		DBFunctions::CloseConnection();
+		if ($row = mysql_fetch_array($result)) {
+			echo "<br><br>";		
+			$arrmodified = json_decode($row[0], true);
+			return $arrmodified[$term];
+		}
+		else
+			return null;
+	}
 	public function ReceiveRequest($req)
 	{
 		//Buralarý nasý yapsak bilemedim. Sýkýntýlar mevcudðð.

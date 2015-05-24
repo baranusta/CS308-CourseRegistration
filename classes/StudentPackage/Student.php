@@ -158,6 +158,14 @@ class Student extends User
 		$this->CoursesTaken[$term][$cnr] = $CourseRetriever->GetSearchedCourses($term,$sqlwhere);
 	}
 	
+	public function enterGrade($term,$name,$cnr,$grade)
+	{
+		$this->RegisteredCourses->{$term}->{$cnr} = array("shortName"=>$name,"grade"=>$grade);
+		$CourseRetriever = new CoursesController();
+		return($this->RegisteredCourses);
+		
+	}
+	
 	public function removeCourse($term,$cnr){
 		if(!$this->RegisteredCourses)
 			$this->RegisteredCourses = new stdClass();

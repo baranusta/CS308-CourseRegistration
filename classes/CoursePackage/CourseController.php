@@ -98,7 +98,14 @@ class CoursesController
 		
 		return $AllCourses;
 	}
-	
+	public function getEnrolledStudents($term, $cnr)
+	{
+		$sql = "SELECT registeredStudents FROM schedule.courses".$term." WHERE cnr = '".$cnr."';";
+		DBFunctions::SetRemoteConnection();
+		$resultSet = mysql_query($sql);
+		DBFunctions::CloseConnection();
+		return $resultSet;
+	}
 	public function returnCourses($values, $term)
 	{
 		$sql = "";
@@ -144,6 +151,14 @@ class CoursesController
 		DBFunctions::CloseConnection();
 		return $result;
 	}
+	public function UpdateGrade($array, $id)
+	{
+		$decoded = json_encode($array);
+		DBFunctions::SetRemoteConnection();
+		$sql = "UPDATE schedule.student SET `registered_courses`='".$decoded."' WHERE `stu_id`='".$id."';";
+		$result = mysql_query($sql);
+		DBFunctions::CloseConnection();
+	}
 	//retrieves all courses as array from wanted term
 	public function getTermCoursesArray($term)
 	{
@@ -166,6 +181,14 @@ class CoursesController
 		if($Course->stuIsRegistered($StuId))
 			$Course->removeStudent($StuId);
 	}
-	
+	public function getCoursebyCNR($cnr, $term)
+	{
+		$sql = "SELECT * From schedule.courses".$term." WHERE cnr ='".$cnr."';";
+		DBFunctions::SetRemoteConnection();
+		$resultSet = mysql_query($sql);
+		DBFunctions::CloseConnection();
+		$result = mysql_fetch_array($resultSet);
+		return $result;
+	}
 }
 ?>

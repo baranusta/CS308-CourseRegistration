@@ -1,6 +1,8 @@
 <?php
 set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\xampp\htdocs\CS308-CourseRegistration\classes');
 include_once 'StudentPackage/Student.php';
+include_once 'ProfessorPackage/Professor.php';
+include_once 'AdminPackage/Admin.php';
 include_once 'DBFunctions.php';
 	session_start();
 	session_destroy();
@@ -21,8 +23,6 @@ include_once 'DBFunctions.php';
 	else {
 		echo "Wrong Username or Password";
 	}
-	
-	
 	
 	
 	function UserIsExist(&$userName,&$password,&$User,$tableName){
@@ -55,12 +55,28 @@ include_once 'DBFunctions.php';
 							echo $e->getMessage();
 						}
 						break;
-					// case 'P':
-						// $_SESSION['myUser'] = new Professor();
-						// break;
-					// case 'A':
-						// $_SESSION['myUser'] = new Admin();
-						// break;
+					case 'P':
+						try
+						{
+							echo $row['user_id'];
+							echo $currentTerm;
+							$User = new Professor($row['user_id'],$currentTerm);
+						}
+						catch(Exception $e)
+						{
+							echo $e->getMessage();
+						}
+						break;
+					case 'A':
+						try
+						{
+							$User = new Admin($row['user_id'],$currentTerm);
+						}
+						catch(Exception $e)
+						{
+							echo $e->getMessage();
+						}
+						break;
 				}
 			return true;
 			}
