@@ -4,9 +4,9 @@ include_once '../PersonalInfoPackage/PersonalInfo.php';
 //include_once '../Course.php';
 //include_once '../RequestPackage/Request.php';
 
-set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\xampp\htdocs\CS308-CourseRegistration\classes');
-include_once 'CoursePackage\CourseController.php';
-include_once 'User.php';
+set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\wamp\www\CS308-CourseRegistration\classes');
+include_once '../CoursePackage/CourseController.php';
+include_once '../User.php';
 
 class Student extends User
 {

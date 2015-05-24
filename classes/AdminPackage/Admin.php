@@ -1,15 +1,15 @@
 <?php
-// set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\wamp\www\CS308-CourseRegistration\classes\AdminPackage');
-//// include_path=".;C:\xampp\htdocs\CS308-CourseRegistration\classes";
-//// include_once 'Courses.php';
-//// include_once 'RequestPackage/Request.php';
-// include_once '../ProfessorPackage/Professor.php';
-// include_once '../StudentPackage/Student.php';
-// include_once '../PersonalInfoPackage/PersonalInfo.php';
-// include_once '../User.php';
-// include_once '../DBFunctions.php';
-// include_once 'AdminUserController.php';
-set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\xampp\htdocs\CS308-CourseRegistration\classes');
+set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\wamp\www\CS308-CourseRegistration\classes\AdminPackage');
+// include_path=".;C:\xampp\htdocs\CS308-CourseRegistration\classes";
+// include_once 'Courses.php';
+// include_once 'RequestPackage/Request.php';
+include_once '../ProfessorPackage/Professor.php';
+include_once '../StudentPackage/Student.php';
+include_once '../PersonalInfoPackage/PersonalInfo.php';
+include_once '../User.php';
+include_once 'AdminUserController.php';
+include_once 'AdminUserDB.php';
+//set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\xampp\htdocs\CS308-CourseRegistration\classes');
 
 //include_once 'Courses.php';
 //include_once 'RequestPackage\Request.php';
@@ -20,18 +20,22 @@ include_once 'DBFunctions.php';
 
 class Admin extends User
 {	
-	function returnBack ()
+	public function getFirstScreen()
+	{}
+	public function getBrowseCourseActionPage()
+	{}
+	public function AddUser()
 	{
-		echo "<br>Click Back to return the previous page";
-		echo "<html>";
-		echo "<form action = \"addUser.php\">";
-		echo "<tr><td> <INPUT TYPE = \"Submit\" Name = \"SubmitButton\" VALUE =\"Back\"> </td></tr>";
-		echo "</form>";
-		echo "</html>";
-	}
-	
-	public function AddUser($User)
-	{
+		function returnBack ()
+		{
+			echo "<br>Click Back to return the previous page";
+			echo "<html>";
+			echo "<form action = \"addUser.php\">";
+			echo "<tr><td> <INPUT TYPE = \"Submit\" Name = \"SubmitButton\" VALUE =\"Back\"> </td></tr>";
+			echo "</form>";
+			echo "</html>";
+		}
+		
 		if (!empty ($_POST['username'])) //check if the "username" blank is filled, if not gives an error
 		{
 			$username = $_POST['username']; //gets the username
@@ -70,19 +74,18 @@ class Admin extends User
 					
 					if ($formType == 'A')
 					{
-						$adminUController->AddUser($user, null, null);
+						$adminUController->AddUser($user, null, null, null);
 					}
 					elseif ($formType == 'P')
 					{
 						$prof = new Professor ($personalInfo);
-						$adminUController->AddUser($user, $personalInfo);
+						$adminUController->AddUser($user, $personalInfo, null, null);
 					} 
 					elseif ($formType == 'S')
 					{
 						$major = $_POST['major'];
 						$gradYear = $_POST['gradYear'];
 						
-						$stu = new Student ($personalInfo, $gradYear, $major);
 						$adminUController->AddUser($user, $personalInfo, $gradYear, $major);
 					}
 					
@@ -122,7 +125,11 @@ class Admin extends User
 	
 	public function ModifyUserInfo()
 	{
-		//Nasıl yapcaımızı konuşmamız lazım.
+		// $adUserController = new AdminUserController;
+		// $adUserController->ModifyUserInfo(); 
+		
+		$aduserDB = new AdminUserDB;
+		$aduserDB->ModifyUserInfo();
 	}
 	
 	public function GetUserInfo()
@@ -255,8 +262,6 @@ class Admin extends User
 		$query = "DELETE FROM schedule.user WHERE user_id = '$userId';";
 		mysql_query($query);
 	}
-	
-	
 	
 	public function DeleteUserById($userIdArray)
 	{
