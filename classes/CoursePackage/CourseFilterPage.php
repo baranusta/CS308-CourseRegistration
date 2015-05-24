@@ -94,7 +94,7 @@
 <span class="fieldlabeltext">Term: </span></label>
 <select name="p_term" size="1" id="term_input_id">
 <option value="">None
-</option><option value="201402">Spring 2014-2015 (View only)
+</option><option value="201402">Spring 2014-2015
 </option><option value="201401">Fall 2014-2015 (View only)
 </option><option value="201302">Spring 2013-2014 (View only)
 </option><option value="201301">Fall 2013-2014 (View only)

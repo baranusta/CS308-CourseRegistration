@@ -1,5 +1,11 @@
 <?php
+
 /* include_once 'Courses.php';
+
+set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\xampp\htdocs\CS308-CourseRegistration\classes');
+//include_path=".;C:\xampp\htdocs\CS308-CourseRegistration\classes";
+include_once 'Courses.php';
+
 include_once 'RequestPackage/Request.php';
 include_once 'ProfessorPackage/Professor.php';
 include_once 'StudentPackage/Student.php';
@@ -33,10 +39,16 @@ class AdminUserController
 		}
 	}
 	
-	public function DeleteUser($User)
+	
+	
+	public function DeleteUser($username)
 	{
 		$AdminUserDb;
-		//DB li bişiler çözcez
+
+		
+		
+		
+		
 	}
 	
 	public function ModifyUserInfo()

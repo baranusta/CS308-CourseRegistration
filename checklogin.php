@@ -15,6 +15,7 @@ include_once 'DBFunctions.php';
 		// }
 		$_SESSION['userName'] = $username;
 		$_SESSION['myUser'] = $User;
+		$_SESSION['ActiveTerm'] = '201402';
 		header("location:login_success.php");
 	}
 	else {
@@ -46,7 +47,7 @@ include_once 'DBFunctions.php';
 					case 'S':
 						try
 						{
-							$User = new Student($row['user_id'],$currentTerm);
+							$User = new Student($row['user_id']);
 							// echo var_dump($User->getTakenCourses());
 						}
 						catch(Exception $e)

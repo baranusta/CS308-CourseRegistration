@@ -21,6 +21,10 @@ class User
 		return $this->password;
 	}
 	public function getUserType()
+	{}
+
+	private $id;
+	public function __construct($ID)
 	{
 		return $this->userType;
 	}
