@@ -20,7 +20,6 @@ class Course
 	private $prerequisites;
 	private $corequisites;
 	private $professor;
-	private $students;
 	private $studentArr;
 	private $grades;
 	
@@ -29,6 +28,9 @@ class Course
 		$this->cnr = $row["cnr"];
 		$this->longName = $row["longName"];
 		$this->shortName = $row["classCode"];
+		
+		
+		///TO-DO
 		$this->capacity = $row["capacity"];
 		$this->actual = 0;
 		$this->credits = $row["credit"];
@@ -246,6 +248,10 @@ class Course
 	
 	public function getCorequisites(){
 		return $this->corequisites;
+	}
+	
+	public function getCredit(){
+		return $this->credits;
 	}
 }
 ?>

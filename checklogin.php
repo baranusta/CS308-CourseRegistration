@@ -47,7 +47,7 @@ include_once 'DBFunctions.php';
 					case 'S':
 						try
 						{
-							$User = new Student($row['user_id'],$currentTerm);
+							$User = new Student($row['user_id']);
 							// echo var_dump($User->getTakenCourses());
 						}
 						catch(Exception $e)

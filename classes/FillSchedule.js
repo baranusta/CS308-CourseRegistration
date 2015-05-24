@@ -2,6 +2,7 @@ var scheduleTable;
 
 	$( document ).ready(function() {
 		scheduleTable = document.getElementById('schedule').rows;
+		console.log(Schedule);
 		for (var day in Schedule) {
 			if (Schedule.hasOwnProperty(day)) {
 				fillSchedule(scheduleTable,ReturnIndexOfDay(day),Schedule[day]);

@@ -7,10 +7,12 @@
 					var isDropped = false;
 					for(var taken in checkedCourses){
 						if(CorequisiteArr[elms] == checkedCourses[taken]){
-							isTaken = true;
+							isDropped = true;
 						}
 					}
-					if(!istaken){
+					console.log(checkedCourses);
+					console.log(CorequisiteArr);
+					if(!isDropped){
 						alert("Corequisite is not taken");
 						return false;
 					}
@@ -25,7 +27,7 @@ $( document ).ready(function() {
 		var checkbox = document.createElement("input"); 
 		checkbox.setAttribute("type", "checkbox");
 		checkbox.setAttribute("name", "cnr[]");
-		checkbox.setAttribute("value", RegisteredCourses[Course][3]);
+		checkbox.setAttribute("value", Course + "," + RegisteredCourses[Course][3]);
 		myDiv.appendChild(checkbox); 
 		var newlabel = document.createElement("Label");
 		newlabel.setAttribute("for",RegisteredCourses[Course][3]);
@@ -38,36 +40,38 @@ $( document ).ready(function() {
 		// do this after you append it
 		checkbox.checked = false; 
 	}
-});
-	
-	
-$('input[type=checkbox]').change(
+	$('input[type=checkbox]').change(
     function(){
-		console.log("up");
+			var val = this.value.split(",")[0];
         if (this.checked) {
-			if(!checkCorequisiteOk(Courses[this.value][0]))
+			if(!checkCorequisiteOk(RegisteredCourses[val]))
 			{
-				alert("Please drop also" + Courses[this.value][0]["corequisites"] + "of that course");
-				CorequisiteArr[Courses[this.value][0]] = Courses[this.value][0]["corequisites"];
-				checkedCourses.push(Courses[this.value][0]);
+				alert("Please drop also" + RegisteredCourses[val][4] + "of that course");
+				CorequisiteArr[RegisteredCourses[val][0]] = RegisteredCourses[val][4];
+				checkedCourses.push(RegisteredCourses[val][0]);
 			}
         }
 		else
 		{
-			checkedCourses.push(Courses[this.value][0]);
-			if(CorequisiteArr.hasOwnProperty(Courses[this.value][0]))
-				delete CorequisiteArr[Courses[this.value][0]];
+			var index = checkedCourses.indexOf(RegisteredCourses[val][0]);
+			if (index > -1) {
+				checkedCourses.splice(index, 1);
+			}
+			if(CorequisiteArr.hasOwnProperty(RegisteredCourses[val][0]))
+				delete CorequisiteArr[RegisteredCourses[val][0]];
 		}
     });
+});
+	
+	
+
 	
 	
 	function checkCorequisiteOk(Obj){
-		if(Obj['corequisites'].length > 0){
+		console.log(Obj);
+		if(Obj[0].length > 0){
 			for (var course in RegisteredCourses) {
-				console.log(RegisteredCourses[course]);
-				
-				console.log(Obj['corequisites']);
-				if(Obj['corequisites'] == RegisteredCourses[course][0])
+				if(Obj[0] == RegisteredCourses[course][4])
 				{
 					return false;
 				}

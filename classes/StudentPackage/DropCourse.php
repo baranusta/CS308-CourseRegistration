@@ -9,8 +9,8 @@ if(!empty($_POST['cnr']))
 		if(!isset($_SESSION)){
 			session_start();
 		}
-		$_SESSION['myUser']->removeCourse($_SESSION['ActiveTerm'],$course);
-		// $_SESSION["AllCourses"][$course."cnr"]->registerStudent($_SESSION['myUser']->getId());
+		$cnr = explode(",",$course)[1];
+		$_SESSION['myUser']->unregisterCourse($_SESSION['ActiveTerm'],$cnr);
     }
 	$_SESSION['myUser']->UpdateRegisteredCourseDB();
 }

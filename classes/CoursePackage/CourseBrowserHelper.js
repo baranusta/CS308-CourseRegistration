@@ -11,11 +11,11 @@
 				for(var elms in CorequisiteArr){
 					var isTaken = false;
 					for(var taken in checkedCourses){
-						if(CorequisiteArr[elms] == checkedCourses[taken]){
+						if(CorequisiteArr[elms] == checkedCourses[taken].shortName){
 							isTaken = true;
 						}
 					}
-					if(!istaken){
+					if(!isTaken){
 						alert("Corequisite is not taken");
 						return false;
 					}

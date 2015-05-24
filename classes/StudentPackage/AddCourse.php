@@ -9,12 +9,12 @@ if(!empty($_POST['cnr']))
 			session_start();
 		}
 		$name = $_SESSION["AllCourses"][$course.'cnr']->getShortName();
-		$isCoreq = false; 
+		$isCoreq = true; 
 		
-		foreach($_POST['cnr'] as $corCheck){
-			if($_SESSION["AllCourses"][$corCheck.'cnr']->getCorequisites() == $name)
-				$isCoreq |= true;
-		}
+		// foreach($_POST['cnr'] as $corCheck){
+			// if($_SESSION["AllCourses"][$corCheck.'cnr']->getCorequisites() == $name)
+				// $isCoreq |= true;
+		// }
 		$_SESSION['myUser']->registerToCourse($_SESSION['term'],$name,$course,$isCoreq);
 		$_SESSION["AllCourses"][$course."cnr"]->registerStudent($_SESSION['myUser']->getId());
     }

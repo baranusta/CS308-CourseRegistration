@@ -3,12 +3,9 @@
 // include_once 'Courses.php';
 set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\xampp\htdocs\CS308-CourseRegistration\classes');
 include_once 'CoursePackage\CourseController.php';
-include_once 'User.php';
-/* include_once 'PersonalInfo.php';
-include_once 'Courses.php';
-include_once 'Request.php'; */
+include_once 'ActiveUser.php';
 
-class Student extends User
+class Student extends ActiveUser
 {
 	private $Major;
 	private $EnteredYear;
@@ -16,88 +13,20 @@ class Student extends User
 	private $RegisteredCourses;
 	private $PersonalInf;
 	private $Requests;
-	private $CoursesTaken;//All course Objects
-	private $scheduleArr;
 	
-	public function __construct($id,$currentTerm)
+	public function __construct($id)
 	{
-		$this->id = $id;
+		parent::__construct($id);
 		$row = $this->RetrieveStudentData();
 		$this->major = $row['major'];
 		$this->gradYear = $row['grad_year'];
-		$this->RegisteredCourses = json_decode($row['registered_courses']);
+		$this->RegisteredCourses = (array)json_decode($row['registered_courses']);
+		function cmp($a,$b){
+			return strcmp($a,$b);
+		}
+		ksort($this->RegisteredCourses);
 		$this->Requests = json_decode($row['request']);
-		$this->CoursesTaken = $this->GetAllCourses();
-		// foreach($this->CoursesTaken['201402'] as $key=> $var)
-		// {
-			// var_dump($key);
-			// echo '<br>';
-			// var_dump($var);
-		// }
-	}
-	
-	
-	public function GetAllCourses(){
-		$Terms = array();
-		$CourseRetriever = new CoursesController();
-		foreach($this->RegisteredCourses as $key => $value)
-		{
-			$Courses = array();
-			$table= $key;
-			foreach($value as $cnr=> $grade)
-			{
-				$sqlwhere ="WHERE cnr =".$cnr;
-				$Courses[$cnr] = $CourseRetriever->GetSearchedCourses($table,$sqlwhere);
-			}
-			$Terms[$table] = $Courses;
-		}
-		return $Terms;
-	}
-	
-	public function formSchedule($term){
-		if(isset($term,$this->CoursesTaken))
-		{
-			$Courses = $this->CoursesTaken[$term];
-			if(count($Courses)==0){
-				return false;
-			}
-			foreach($Courses as $key=>$value)
-			{
-				$schedule = $value[$key."cnr"]->getSchedule();
-				$courseName = $value[$key."cnr"]->getShortName();
-				$this->fillSchedule($schedule,$courseName);
-			}
-			return true;
-		}
-		else
-			return false;
-		
-	}
-	
-	private function fillSchedule($schedule,$cName)
-	{
-		foreach($schedule as $eachDay)
-		{
-			$times = explode("-",$eachDay["time"]);
-			if(count($times)>1){
-				$start = explode(":",$times[0]);
-				$end = explode(":",$times[1]);
-				$startInd = intval($start[0])-8;
-				if($startInd<0)
-				{
-					$startInd += 12;
-				}
-				$endInd = intval($end[0])-8;
-				if($endInd<0)
-				{
-					$endInd += 12;
-				}
-				for($i = $startInd; $i<$endInd ; $i++)
-				{
-					$this->scheduleArr[$eachDay["day"]][$i] = $eachDay["place"].",".$cName;
-				}
-			}
-		}
+		$this->retrieveCourses($this->RegisteredCourses);
 	}
 	
 	public function getFirstScreen(){
@@ -112,68 +41,38 @@ class Student extends User
 			return "StudentPackage\StudentAddDropPage.php";
 	}
 	
-	public function getSchedule($desiredTerm){
-		unset($this->scheduleArr);
-		if($this->formSchedule($desiredTerm))
-		{
-			return $this->scheduleArr;
-		}
-		return array();
-	}
-	
-	public function getTakenCoursesInfo($term){
-		$CoursesNames = array();
-		foreach($this->CoursesTaken as $key=> $var)
-		{
-			if($key == $term){
-				foreach($var as $cnr => $Obj)
-				{
-					array_push($CoursesNames,array($Obj[$cnr."cnr"]->getShortName(),$Obj[$cnr."cnr"]->getLongName(),$Obj[$cnr."cnr"]->getSchedule(),$Obj[$cnr."cnr"]->getCNR()));
-				}
-				return $CoursesNames;
-			}
-		}
-		
-	}
-	
 	public function getTakenCoursesGrade(){
-		$CoursesNames = array();
 		return $this->RegisteredCourses;
 	}
 	
 	public function registerToCourse($term,$name,$cnr,$mode){
 		
 		if(!$this->RegisteredCourses)
-			$this->RegisteredCourses = new stdClass();
-		if(!property_exists($this->RegisteredCourses, $term)){
-			$this->RegisteredCourses->{$term} = new stdClass();
+			$this->RegisteredCourses = array();
+		if(!isset($this->RegisteredCourses[$term])){
+			$this->RegisteredCourses[$term] = new stdClass();
 		}
 		if($mode)
-			$this->RegisteredCourses->{$term}->{$cnr} = array("shortName"=>$name,"grade"=>"InProgress");
+			$this->RegisteredCourses[$term]->{$cnr} = array("shortName"=>$name,"grade"=>"InProgress");
 		else
-			$this->RegisteredCourses->{$term}->{$cnr} = array("shortName"=>$name,"grade"=>"nope");
-		$CourseRetriever = new CoursesController();
+			$this->RegisteredCourses[$term]->{$cnr} = array("shortName"=>$name,"grade"=>"nope");
 		
-		$sqlwhere ="WHERE cnr =".$cnr;
-		$this->CoursesTaken[$term][$cnr] = $CourseRetriever->GetSearchedCourses($term,$sqlwhere);
+		$this->AddCourse($term,$cnr);
 	}
 	
-	public function removeCourse($term,$cnr){
+	public function unregisterCourse($term,$cnr){
 		if(!$this->RegisteredCourses)
-			$this->RegisteredCourses = new stdClass();
-		if(property_exists($this->RegisteredCourses, $term)){
-			unset($this->RegisteredCourses->{$term}->{$cnr});
+			$this->RegisteredCourses = array();
+		if(isset($this->RegisteredCourses, $term)){
+			unset($this->RegisteredCourses[$term]->{$cnr});
 		}
-		$CourseRemover = new CoursesController();
-		$CourseRemover->removeStudentFromCourse($this->CoursesTaken[$term][$cnr][$cnr."cnr"],$this->id);
-		unset($this->CoursesTaken[$term][$cnr]);
+		$this->RemoveCourse($term,$cnr);
 	}
 	
-	public function UpdateRegisteredCourseDB()
-	{
-		// var_dump($this->RegisteredCourses."lol");
+	public function UpdateRegisteredCourseDB(){
+		$getId = $this->getId();
 		$json = json_encode($this->RegisteredCourses);
-		$sql = "UPDATE schedule.student SET registered_courses='".$json."' WHERE stu_id='$this->id';";
+		$sql = "UPDATE schedule.student SET registered_courses='".$json."' WHERE stu_id='$getId';";
 		DBFunctions::SetRemoteConnection();
 		$result=mysql_query($sql);
 		DBFunctions::CloseConnection();
@@ -183,11 +82,11 @@ class Student extends User
 		}
 		else
 			echo "Something went wrong";
-		
 	}
 	
 	private function RetrieveStudentData(){
-		$sql = "SELECT * FROM schedule.student WHERE stu_id='$this->id';";
+		$getId = $this->getId();
+		$sql = "SELECT * FROM schedule.student WHERE stu_id='$getId'";
 		DBFunctions::SetRemoteConnection();	DBFunctions::SetRemoteConnection();
 		$result=mysql_query($sql);
 		DBFunctions::CloseConnection();
@@ -206,6 +105,20 @@ class Student extends User
 		else
 			throw new Exception("Student not found");;
 	}
-
+	
+	public function GetTranscript(){
+		$transcript;
+		foreach($this->RegisteredCourses as $term=>$courses){
+			$transcript[$term] = array();
+			foreach($courses as $cnr=>$info){
+				echo $term." ".$cnr."<br>";
+				var_dump($info);
+				$longName = $this->getCourseLongName($term,$cnr);
+				$credit = $this->getCourseCredit($term,$cnr);
+				$transcript[$term][$cnr] = array($info['shortName'],$longName,$credit,$info['shortName']); 
+			}
+		}
+		return $transcript;
+	}
 }
 ?>
