@@ -1,16 +1,19 @@
 <?php
 set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\xampp\htdocs\CS308-CourseRegistration\classes');
 include_once 'CoursePackage\CourseController.php';
+include_once 'PersonalInfoPackage\PersonalInfo.php';
 include_once 'User.php';
 abstract class ActiveUser extends User
 {
 	private $CoursesTaken;//All course Objects
 	private $scheduleArr;
+	private $PersonalInfo;
 	
 	
 	public function __construct($id)
 	{
 		parent::__construct($id);
+		$PersonalInfo = new PersonalInfo($id);
 	}
 	
 	public function GetAllCourses($RegisteredCourses){
@@ -29,6 +32,10 @@ abstract class ActiveUser extends User
 			$Terms[$table] = $Courses;
 		}
 		return $Terms;
+	}
+	
+	public getPersonalInfo(){
+		return $PersonalInfo;
 	}
 	
 	public function retrieveCourses($RegisteredCourses){
