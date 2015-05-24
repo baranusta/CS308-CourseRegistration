@@ -8,7 +8,7 @@ class PersonalInfo
 	private $Nationality;
 	private $TelephoneNum;
 	
-	public function __construct($name, $LName, $entY, $address = null, $nation = null, $telNum = null)
+	public function __construct($id)
 	{
 		$this->Name = $name;
 		$this->LastName = $LName;
