@@ -12,11 +12,11 @@ class Admin extends User
 {	
 	
 	public function getFirstScreen(){
-		header("location:classes\StudentPackage\StudentFirstPage.php");
+		header("location:classes/AdminPackage/adminIndex.php");
 	}
 	
 	public function getBrowseCourseActionPage(){
-		return "StudentPackage\AddCourse.php";
+		return null;//"AdminPackage/AddCourse.php";
 	}
 
 	public function AddUser($User)

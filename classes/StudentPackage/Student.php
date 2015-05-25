@@ -19,6 +19,10 @@ class Student extends User
 	private $CoursesTaken;
 	private $scheduleArr;
 	
+	
+	
+	
+	
 	public function __construct($id,$currentTerm)
 	{
 		$this->id = $id;
@@ -37,7 +41,7 @@ class Student extends User
 		
 	}
 	
-	
+
 	public function GetAllCourses(){
 		$Terms = array();
 		$CourseRetriever = new CoursesController();
@@ -67,7 +71,7 @@ class Student extends User
 			}
 		}
 		else
-			echo $term."There is not any course taken for this term";
+			echo $term."There is no course taken for this term";
 		
 	}
 	
@@ -98,15 +102,16 @@ class Student extends User
 	}
 	
 	public function getFirstScreen(){
-		header("location:classes\StudentPackage\StudentFirstPage.php");
+		//header("location:classes/StudentPackage/StudentFirstPage.php");
+		header("location:classes/StudentPackage/stuIndex.php");
 	}
 	
 	public function getBrowseCourseActionPage(){
 		$currentTerm = func_get_arg(0);
 		if($currentTerm)
-			return "StudentPackage\AddCourse.php";
+			return "StudentPackage/AddCourse.php";
 		else
-			return "StudentPackage\StudentAddDropPage.php";
+			return "StudentPackage/StudentAddDropPage.php";
 	}
 	
 	public function getSchedule($desiredTerm){

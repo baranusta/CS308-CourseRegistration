@@ -1,0 +1,5 @@
+<?php
+
+	echo "YÝÐÝTS FUNCTION WILL BE THERE";
+	
+	?>
