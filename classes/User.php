@@ -1,9 +1,10 @@
 <?php
 abstract class User
 {
-	var $id;
-	public function User()
+	private $id;
+	public function __construct($ID)
 	{
+		$this->id = $ID;
 	}
 	
 	public function getId(){
