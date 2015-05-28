@@ -20,7 +20,7 @@ class CoursesController
 		$AllJSON ="";
 		foreach($AllCourses as $Course)
 		{
-			$wholeString .= $Course->GetPageItem();
+			$wholeString .= $Course->GetPageItem($_SESSION["ActiveTerm"]==$term);
 			$AllJSON.= "\"".$Course->getCNR()."\":".$Course->getJSON().",";
 		}
 		$json = $AllJSON;
@@ -98,6 +98,7 @@ class CoursesController
 		
 		return $AllCourses;
 	}
+	
 	public function returnCourses($values, $term)
 	{
 		$sql = "";
@@ -134,6 +135,7 @@ class CoursesController
 		DBFunctions::CloseConnection();
 		return $resultSet;
 	}
+	
 	public function DeleteCourse($array)
 	{
 		DBFunctions::SetRemoteConnection();
@@ -141,6 +143,23 @@ class CoursesController
 		$result = mysql_query($sql);
 		DBFunctions::CloseConnection();
 		return $result;
+	}
+		//retrieves all courses as array from wanted term
+	public function getTermCoursesArray($term)
+	{
+		DBFunctions::SetRemoteConnection();	
+		$query = "SELECT * FROM schedule.courses$term;";		
+		$resultSet = mysql_query($query);
+		$courses = array();
+		
+		while($row = mysql_fetch_array($resultSet))
+		{
+			array_push($courses, $row);
+		}
+		
+		DBFunctions::CloseConnection();
+		
+		return $courses;
 	}
 	
 }

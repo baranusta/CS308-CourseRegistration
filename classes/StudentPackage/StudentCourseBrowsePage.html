@@ -1,0 +1,30 @@
+<head>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="CourseBrowserHelper.js"></script>
+<script type="text/javascript">
+
+var TakenCourses = <?php echo json_encode($User->GetTakenCourses($term)); ?>;
+var Schedule = <?php echo json_encode($User->GetSchedule()); ?>;
+var Courses = <?php echo json_encode($json); ?>;
+Courses = JSON.parse(Courses);
+
+</script>
+</head>
+<body>
+<div class="Right_Part" style="float:right; width:50%; ">
+<div class="schedule_t" style="position:fixed;">
+<table border="1" style="width:100%;border-collapse: collapse; ">
+  <tr>
+    <td>Jill</td>
+    <td>Smith</td> 
+    <td>50</td>
+  </tr>
+  <tr>
+    <td>Eve</td>
+    <td>Jackson</td> 
+    <td>94</td>
+  </tr>
+</table> 
+</div>
+</div>
+</body>

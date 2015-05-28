@@ -2,6 +2,8 @@
 set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\xampp\htdocs\CS308-CourseRegistration\classes');
 include_once 'StudentPackage/Student.php';
 include_once 'DBFunctions.php';
+include_once 'ProfessorPackage/Professor.php';
+include_once 'AdminPackage/Admin.php';
 	session_start();
 	session_destroy();
 	$tableName = 'schedule.user';
@@ -15,6 +17,7 @@ include_once 'DBFunctions.php';
 		// }
 		$_SESSION['userName'] = $username;
 		$_SESSION['myUser'] = $User;
+		$_SESSION['ActiveTerm'] = '201402';
 		header("location:login_success.php");
 	}
 	else {
@@ -54,12 +57,12 @@ include_once 'DBFunctions.php';
 							echo $e->getMessage();
 						}
 						break;
-					// case 'P':
-						// $_SESSION['myUser'] = new Professor();
-						// break;
-					// case 'A':
-						// $_SESSION['myUser'] = new Admin();
-						// break;
+					case 'P':
+						$User = new Professor();
+						
+					case 'A':
+						$User = new Admin();
+						
 				}
 			return true;
 			}

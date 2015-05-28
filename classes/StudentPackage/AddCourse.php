@@ -12,6 +12,7 @@ if(!empty($_POST['cnr']))
 		$_SESSION["AllCourses"][$course."cnr"]->registerStudent($_SESSION['myUser']->getId());
     }
 	$_SESSION['myUser']->UpdateRegisteredCourseDB();
+header("location:StudentAddDropPage.php");
 }
 else{
 }

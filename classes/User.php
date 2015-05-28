@@ -1,6 +1,7 @@
 <?php
 abstract class User
 {
+
 	var $id;
 	public function User()
 	{

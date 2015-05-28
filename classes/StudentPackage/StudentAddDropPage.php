@@ -1,61 +1,18 @@
 <?php
-set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\xampp\htdocs\CS308-CourseRegistration\classes');
-include_once 'CoursePackage/CourseController.php';
-include_once 'StudentPackage/Student.php';
-
-$sqlwhere = "";
-$courseNum = "";
-
-if(isset($_POST["sel_subj"]))
-{
-	$classCode = $_POST["sel_subj"];
-}
-if(isset($_POST["sel_crse"]))
-{
-	$courseNum = $_POST["sel_crse"];
-	if(strlen($courseNum))
-		$sqlwhere ="WHERE cnr =".$courseNum;
-}
-
-//required where statement is constructed accordingly
-if($classCode != "*")
-{
-	$code =  "classCode LIKE '".$classCode."%'";
-	if(strlen($sqlwhere) > 0)
-		$sqlwhere.= " AND ".$code;
-	else
-		$sqlwhere = "WHERE ".$code;
-}
-$term = $_POST["p_term"];
-	session_start();
-	$_SESSION["term"] = $term;
-	$cTerm = $_SESSION["ActiveTerm"];
-if(isset($_SESSION["AllCourses"]))
-	unset($_SESSION["AllCourses"]);
-$CController = new CoursesController();
-$json = "";
-$wholeString = $CController->GetSearchedCoursesItems($term,$sqlwhere,$json);
-//if no course found according to the criteria wholeString will be empty 
-if($wholeString == "")
-{
-	echo "No Course Found!!";
-}	
-else
-{
-	//if there is any course,
+include_once 'Student.php';
+session_start();
+	if(!isset($_SESSION['userName'])){
+		header("location:../../main_login.php");
+	}
+	else{
+		$User = $_SESSION['myUser'];
+	}
 	$withLocation = false;
-	//TO-DO
-	//form action part has to be edited.
-	$User = $_SESSION['myUser'];
-	$action = "..\\".$User->getBrowseCourseActionPage($cTerm==$term); 
-	//echo $action;
-	echo 	"	<div style=\"float:right; width:40%;\">
-				<form action=\"$action\" method=\"post\" onsubmit=\"return valthisform()\">"
-				.$wholeString
-				."<button style=\"top:43; right: 43%; position:fixed;\" type=\"submit\" value=\"Submit\">Submit</button>
-				</form></div>";
-}
+	
+	$term = $_SESSION['ActiveTerm'];
 ?>
+
+
 <head>
 <style>
 th, td {
@@ -66,22 +23,19 @@ th, td {
 }
 </style>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-<script src="CourseBrowserHelper.js"></script>
+<script src="../CoursePackage/DropPageHelper.js"></script>
 <script src="../FillSchedule.js"></script>
 <script type="text/javascript">
 
-var TakenCourses = <?php echo json_encode($User->GetTakenCourses()); ?>;
+
+var RegisteredCourses = <?php echo json_encode($User->getRegisteredCourses($term)); ?>;
 var Schedule = <?php echo json_encode($User->GetSchedule($term)); ?>;
 var withLocation = <?php echo json_encode($withLocation); ?>;
-var SubmitAction = <?php echo json_encode($cTerm==$term); ?>;
-var Courses = <?php echo json_encode($json); ?>;
-Courses = JSON.parse(Courses);
 
 </script>
 </head>
 <body>
 <div class="Right_Part" style="float:left; width:50%; ">
-<div class="schedule_t" style="position:fixed;">
 <table id="schedule" border="1" style="width:100%;border-collapse: collapse; ">
   <tr>
     <td>Monday</td>
@@ -180,6 +134,17 @@ Courses = JSON.parse(Courses);
   </tr>
 </table> 
 </div>
+<form action="../CoursePackage/CourseFilterPage.php" style="position:relative; top:30; left: 50;">
+    <input type="submit" value="Add Course">
+</form>
+<div style="position:relative; top:30; left: 50;">
+All Courses
+<form action="../CoursePackage/CourseFilterPage.php" >
+<div id="takenCourses">
+</div>
+<div id="ActionButton">
+<button style="top:30; position:relative;" type="submit" value="Submit">Submit Changes</button>
+</div>
+</form>
 </div>
 </body>
-	
