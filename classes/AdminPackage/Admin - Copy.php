@@ -11,14 +11,9 @@ include_once 'DBFunctions.php';
 class Admin extends User
 {	
 	
-	public function getFirstScreen(){
-		header("location:classes\StudentPackage\StudentFirstPage.php");
-	}
-	
-	public function getBrowseCourseActionPage(){
-		return "StudentPackage\AddCourse.php";
-	}
 
+
+	
 	public function AddUser($User)
 	{
 		$AdminController;
@@ -41,12 +36,17 @@ class Admin extends User
 		$AdminCourseController;
 	}
 	
-
+	public function DeleteCourse($Course)
+	{
+		//need to delete course from student also
+	}
 	
 	public function ModifyUserInfo()
 	{
 		//Nasıl yapcaımızı konuşmamız lazım.
 	}
+	
+	
 
 	public function deleteStudent($userId)
 	{
@@ -87,7 +87,7 @@ class Admin extends User
 	}
 	
 	
-	public function deleteCourse($courseCNR, $term)
+	public function deleteCourseCourse($courseCNR, $term)
 	{
 		$query = "DELETE FROM schedule.courses$term WHERE cnr = '$courseCNR';";
 		$resultSet = mysql_query($query);
@@ -106,6 +106,7 @@ class Admin extends User
 		{
 			$registeredCourseArray = $student['registered_courses'];//get json of courses
 			$registeredCourseArray = json_decode($registeredCourseArray, true);
+
 			if(in_array($courseCNR, $registeredCourseArray[(int)$term]))//if array has the cnr in wanted term
 			{
 				$key = array_search($courseCNR, $registeredCourseArray[(int)$term]);//find the key of the cnr code in term
@@ -158,20 +159,10 @@ class Admin extends User
 	
 	public function DeleteUserById($userIdArray)
 	{
+		
 		$userInfoArray = array();//empty array
 		foreach($userIdArray as&$userId)
 		{
-		DBFunctions::SetRemoteConnection();
-		if(gettype($userIdArray) == "string")
-		{
-			$userInfoArray = array();//empty array
-			$userInfoArray = array($userIdArray);
-		}
-		
-		//var_dump($userIdArray);
-		foreach($userIdArray as&$userId)
-		{
-			
 			$query = "SELECT * FROM schedule.user WHERE user_id = $userId;";//every user have unique id
 			$checkUser = mysql_fetch_array(mysql_query($query));
 			if($checkUser['type'] == "P")
@@ -180,18 +171,14 @@ class Admin extends User
 			}
 			else if($checkUser['type'] == "S")
 			{
-				$this->DeleteProf($checkUser['user_id']);
-			}
-			else if($checkUser['type'] == "S")
-			{
-				$this->deleteStudent($checkUser['user_id']);
+				deleteStudent($checkUser['user_id']);
 			}
 			else if($checkUser['type'] == "A")
 			{
 				
 			}
+			
 		}
-	}
 	}
 	
 	
@@ -350,7 +337,7 @@ class Admin extends User
 			array_push($allUserArray,$row);
 		} */
 		$allUserArray = GetInfoById(null,$resultSet);
-		$allUserArray = $this->GetPersonalInfoById(null,$resultSet);
+		
 		return $allUserArray;
 		
 	}

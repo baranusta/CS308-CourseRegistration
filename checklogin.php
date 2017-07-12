@@ -15,6 +15,7 @@ include_once 'DBFunctions.php';
 		// }
 		$_SESSION['userName'] = $username;
 		$_SESSION['myUser'] = $User;
+		$_SESSION['ActiveTerm'] = '201402';
 		header("location:login_success.php");
 	}
 	else {

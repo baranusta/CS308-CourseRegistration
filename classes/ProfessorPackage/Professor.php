@@ -12,15 +12,17 @@ class Professor extends User
 	private $PersonalInf;
 	private $Requests;
 	
-	public function __construct($persInf, $fac = null, $major = null)
+/* 	public function __construct($persInf, $fac = null, $major = null)
 	{
 		$this->PersonalInf = $persInf;
 		$this->Faculty = $fac;
 		$this->Major = $major;
 		$this->GivenCourses = array();
 		$this->Requests = array();
-	}
-	
+	} */
+
+	public function getFirstScreen(){}
+	public function getBrowseCourseActionPage(){}
 	
 }
 ?>

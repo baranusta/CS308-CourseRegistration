@@ -3,8 +3,6 @@ set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\xampp\htdocs\CS308-Co
 set_include_path(get_include_path() . PATH_SEPARATOR . 'C:\xampp\htdocs\CS308-CourseRegistration');
 include_once 'StudentPackage/Student.php';
 session_start();
-
-	echo $_SESSION['userName'];
 	if(!isset($_SESSION['userName'])){
 		echo 'Login Failed';
 	}
